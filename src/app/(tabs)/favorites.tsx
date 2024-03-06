@@ -2,12 +2,12 @@ import { StyleSheet } from "react-native"
 
 import { View, Text } from "react-native-ui-lib"
 
-const TabOneScreen = () => {
+const FavoritesScreen = () => {
   return (
     <View flex center>
-      <Text>Home screen</Text>
+      <Text>Favorites</Text>
     </View>
   )
 }
 
-export default TabOneScreen
+export default FavoritesScreen

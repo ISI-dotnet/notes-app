@@ -2,12 +2,12 @@ import { StyleSheet } from "react-native"
 
 import { View, Text } from "react-native-ui-lib"
 
-const TabOneScreen = () => {
+const BrowseScreen = () => {
   return (
     <View flex center>
-      <Text>Home screen</Text>
+      <Text> Browse screen</Text>
     </View>
   )
 }
 
-export default TabOneScreen
+export default BrowseScreen
