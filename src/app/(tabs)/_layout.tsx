@@ -13,13 +13,13 @@ const TabLayout = () => {
         tabBarStyle: {
           borderRadius: 30,
           marginBottom: 10,
-          marginHorizontal: 5,
+          marginHorizontal: 8,
           elevation: 0,
           height: 60,
         },
         tabBarItemStyle: {
           padding: 10,
-          borderRadius: 100,
+          borderRadius: 30,
         },
       }}
     >
