@@ -1,10 +1,10 @@
 import { StyleSheet } from "react-native"
 
-import { View, Text } from "react-native-ui-lib"
+import { View, Text } from "react-native"
 
 const FavoritesScreen = () => {
   return (
-    <View flex center>
+    <View>
       <Text>Favorites</Text>
     </View>
   )

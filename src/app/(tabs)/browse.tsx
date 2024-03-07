@@ -1,10 +1,8 @@
-import { StyleSheet } from "react-native"
-
-import { View, Text } from "react-native-ui-lib"
+import { View, Text } from "react-native"
 
 const BrowseScreen = () => {
   return (
-    <View flex center>
+    <View className="justify-center">
       <Text> Browse screen</Text>
     </View>
   )
