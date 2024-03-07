@@ -1,8 +1,7 @@
 import { COLORS } from "@/src/constants/Colors"
 import { AntDesign } from "@expo/vector-icons"
 import { Link } from "expo-router"
-import { View, Text, Button, TouchableOpacity, Pressable } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { View, Text, Pressable } from "react-native"
 
 const HomeScreen = () => {
   return (
