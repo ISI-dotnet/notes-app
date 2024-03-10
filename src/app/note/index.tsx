@@ -15,9 +15,9 @@ import { actions, RichEditor, RichToolbar } from "react-native-pell-rich-editor"
 import { COLORS } from "@/src/constants/Colors"
 import { useTheme } from "@react-navigation/native"
 import Toolbar from "@/src/components/note/Toolbar"
+import RichTextEditor from "@/src/components/note/RichTextEditor"
 
 const Note = () => {
-  const { colors } = useTheme()
   const richText = useRef<RichEditor | null>(null)
   const scrollRef = useRef<ScrollView | null>(null)
 
@@ -25,6 +25,7 @@ const Note = () => {
   const [isFocused, setIsFocused] = useState(false)
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
 
+  // effect used for showing and hiding note styling toolbar based on keyboard visibility on screen
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
@@ -46,6 +47,7 @@ const Note = () => {
     }
   }, [])
 
+  // When note is long enough not not fit in screen, scroll the note by 30px when entering new line
   const handleScroll = (scrollY: number) => {
     // Only trigger scrolling if the RichEditor is focused
     if (isFocused && scrollRef.current) {
@@ -73,7 +75,6 @@ const Note = () => {
         nestedScrollEnabled={true}
       >
         <KeyboardAvoidingView
-          className="flex-1"
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
           <TextInput
@@ -85,27 +86,14 @@ const Note = () => {
             multiline={true}
           />
 
-          <RichEditor
-            showsVerticalScrollIndicator={false}
-            placeholder="Note"
-            style={{ marginHorizontal: 4 }}
-            editorStyle={{
-              backgroundColor: colors.background,
-              placeholderColor: "#606060",
-              caretColor: COLORS.darkOrange,
-            }}
+          <RichTextEditor
             ref={richText}
-            onChange={(descriptionText) => {
-              console.log("descriptionText:", descriptionText)
-            }}
-            onFocus={() => {
-              setIsFocused(true)
-            }}
-            onBlur={() => setIsFocused(false)}
-            onCursorPosition={handleScroll}
+            setIsFocused={setIsFocused}
+            handleScroll={handleScroll}
           />
         </KeyboardAvoidingView>
       </ScrollView>
+      {/* Toolbar is only visible on note description and when the keyboard is open */}
       {isFocused && isKeyboardVisible && <Toolbar editor={richText} />}
     </View>
   )
