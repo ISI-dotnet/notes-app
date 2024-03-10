@@ -1,11 +1,12 @@
 import { COLORS } from "@/src/constants/Colors"
 import { AntDesign } from "@expo/vector-icons"
 import { Link } from "expo-router"
-import { View, Text, Pressable } from "react-native"
+import { Text, Pressable } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 const HomeScreen = () => {
   return (
-    <View className="flex-1">
+    <SafeAreaView className="flex-1">
       <Text className="">Home Screen</Text>
       <Link href={"/note/"} asChild>
         <Pressable
@@ -19,7 +20,7 @@ const HomeScreen = () => {
           ></AntDesign>
         </Pressable>
       </Link>
-    </View>
+    </SafeAreaView>
   )
 }
 
