@@ -1,8 +1,6 @@
 import { COLORS } from "@/src/constants/Colors"
 import { Feather } from "@expo/vector-icons"
 import { Tabs } from "expo-router"
-import { SafeAreaView } from "react-native-safe-area-context"
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 
 const TabLayout = () => {
   return (
@@ -11,7 +9,6 @@ const TabLayout = () => {
         tabBarActiveTintColor: COLORS.lightGray,
         tabBarActiveBackgroundColor: "orange",
         tabBarStyle: {
-          position: "absolute",
           borderRadius: 30,
           marginBottom: 10,
           marginHorizontal: 8,
