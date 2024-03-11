@@ -1,27 +1,44 @@
-import { Stack } from "expo-router"
+import { Stack, useLocalSearchParams } from "expo-router"
 import { AntDesign } from "@expo/vector-icons"
 import React, { useEffect, useRef, useState } from "react"
 import {
-  Animated,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Text,
   TextInput,
   View,
 } from "react-native"
-import { actions, RichEditor, RichToolbar } from "react-native-pell-rich-editor"
-import { COLORS } from "@/src/constants/Colors"
-import { useTheme } from "@react-navigation/native"
+import { RichEditor } from "react-native-pell-rich-editor"
 import Toolbar from "@/src/components/note/Toolbar"
 import RichTextEditor from "@/src/components/note/RichTextEditor"
+import { Note } from "@/src/types/Note"
 
-const Note = () => {
+const NotePage = () => {
+  const { id } = useLocalSearchParams()
+  const [noteDetails, setNoteDetails] = useState<Note>({
+    id: 0,
+    title: "",
+    description: "",
+    parentFolder: "home",
+  })
+
+  //TODO: change useEffect to fetch note details based on ID
+  useEffect(() => {
+    if (id !== "0") {
+      console.log("triggered")
+      setNoteDetails({
+        id: Number(id),
+        title: "Note one",
+        description: "<b>Example note</b>",
+        parentFolder: "home",
+      })
+    }
+  }, [])
+
   const richText = useRef<RichEditor | null>(null)
   const scrollRef = useRef<ScrollView | null>(null)
 
-  const [title, setTitle] = useState("")
   const [isFocused, setIsFocused] = useState(false)
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
 
@@ -80,13 +97,17 @@ const Note = () => {
           <TextInput
             className="text-2xl p-4 font-medium"
             placeholder="Title"
-            value={title}
-            onChangeText={(text) => setTitle(text)}
+            maxLength={200}
+            value={noteDetails.title}
+            onChangeText={(text) =>
+              setNoteDetails((oldValue) => ({ ...oldValue, title: text }))
+            }
             selectionColor={"orange"}
             multiline={true}
           />
 
           <RichTextEditor
+            description={noteDetails.description}
             ref={richText}
             setIsFocused={setIsFocused}
             handleScroll={handleScroll}
@@ -99,4 +120,4 @@ const Note = () => {
   )
 }
 
-export default Note
+export default NotePage
