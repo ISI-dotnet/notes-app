@@ -16,19 +16,29 @@ const NoteItem = ({ noteDetails }: NoteItemProps) => {
   }
   return (
     <TouchableOpacity
-      className="flex-row items-center bg-white rounded-lg my-1 px-2 py-3"
+      className="flex-row items-center bg-white rounded-lg my-1 px-2 py-3 h-20"
       onPress={handleNoteItemPress}
     >
-      <View className="h-full mr-3">
+      <View className="mr-3">
         <MaterialCommunityIcons
           name="note-text-outline"
           size={30}
           color="orange"
         />
       </View>
-      <Text className={`text-gray-800 text-lg h-full`}>
-        {noteDetails.title}
-      </Text>
+      <View className="flex-1">
+        <Text
+          className={`text-gray-800 font-semibold text-lg`}
+          numberOfLines={1}
+        >
+          {noteDetails.title}
+        </Text>
+        <Text className={` text-gray-500 `} numberOfLines={2}>
+          {noteDetails.description
+            ? noteDetails.description
+            : "Description empty"}
+        </Text>
+      </View>
     </TouchableOpacity>
   )
 }

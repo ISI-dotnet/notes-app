@@ -6,7 +6,7 @@ import { View, Text, FlatList } from "react-native"
 const dummyNotesData = [
   {
     id: 1,
-    title: "First note",
+    title: "First note eyuw8 wyuwefd gyuw wweeeweww",
     description: "This is description",
     parentFolder: "home",
   },
@@ -25,13 +25,14 @@ const dummyNotesData = [
   {
     id: 4,
     title: "Fourth note",
-    description: "This is description",
+    description:
+      "This is description a very long desription ocntaining a lot of words and a long story blah blah blah and isusedtotest",
     parentFolder: "home",
   },
   {
     id: 5,
     title: "Fifth note",
-    description: "This is description",
+    description: "",
     parentFolder: "home",
   },
 ]
