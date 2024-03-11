@@ -4,6 +4,7 @@ import { useFonts } from "expo-font"
 import { Stack } from "expo-router"
 import * as SplashScreen from "expo-splash-screen"
 import { useEffect } from "react"
+import { ThemeProvider } from "@react-navigation/native"
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -42,10 +43,24 @@ export default function RootLayout() {
   return <RootLayoutNav />
 }
 
+const MyTheme = {
+  dark: false,
+  colors: {
+    primary: "rgb(255, 45, 85)",
+    background: "rgb(242, 242, 242)",
+    card: "rgb(255, 255, 255)",
+    text: "rgb(28, 28, 30)",
+    border: "rgb(199, 199, 204)",
+    notification: "rgb(255, 69, 58)",
+  },
+}
+
 function RootLayoutNav() {
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    </Stack>
+    <ThemeProvider value={MyTheme}>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      </Stack>
+    </ThemeProvider>
   )
 }
