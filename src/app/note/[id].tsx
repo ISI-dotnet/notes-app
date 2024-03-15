@@ -13,6 +13,7 @@ import { RichEditor } from "react-native-pell-rich-editor"
 import Toolbar from "@/src/components/note/Toolbar"
 import RichTextEditor from "@/src/components/note/RichTextEditor"
 import { Note } from "@/src/types/Note"
+import { initialDummyNotesData } from "@/src/constants/DummyData"
 
 const NotePage = () => {
   const { id } = useLocalSearchParams()
@@ -28,13 +29,9 @@ const NotePage = () => {
   useEffect(() => {
     if (id !== "0") {
       console.log("triggered")
-      setNoteDetails({
-        id: Number(id),
-        title: "Note one",
-        description: "<b>Example note</b>",
-        parentFolderName: "Home",
-        parentFolderId: 0,
-      })
+      const note = initialDummyNotesData.find((note) => note.id === Number(id))
+      if (!note) return
+      setNoteDetails(note)
     }
   }, [])
 
