@@ -1,6 +1,5 @@
 import { Text, TouchableOpacity, View } from "react-native"
-import { AntDesign } from "@expo/vector-icons"
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons"
+import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { Note } from "@/src/types/Note"
 import { useRouter } from "expo-router"
 type NoteItemProps = {

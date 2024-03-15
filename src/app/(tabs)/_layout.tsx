@@ -42,12 +42,14 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="browse"
+        name="browse/[...browse]"
         options={{
+          title: "Browse",
           tabBarIcon: ({ color }) => (
             <Feather name="folder-minus" size={24} color={color} />
           ),
         }}
+        initialParams={{ browse: "home" }}
       />
     </Tabs>
   )
