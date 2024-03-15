@@ -20,10 +20,11 @@ const NotePage = () => {
     id: 0,
     title: "",
     description: "",
-    parentFolder: "home",
+    parentFolderName: "Home",
+    parentFolderId: 0,
   })
 
-  //TODO: change useEffect to fetch note details based on ID
+  //TODO: change useEffect to fetch note details based on ID from DB
   useEffect(() => {
     if (id !== "0") {
       console.log("triggered")
@@ -31,7 +32,8 @@ const NotePage = () => {
         id: Number(id),
         title: "Note one",
         description: "<b>Example note</b>",
-        parentFolder: "home",
+        parentFolderName: "Home",
+        parentFolderId: 0,
       })
     }
   }, [])

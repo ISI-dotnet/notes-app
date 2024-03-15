@@ -2,7 +2,8 @@ export type Note = {
   id: number
   title: string
   description: string
-  parentFolder: string
+  parentFolderId: number
+  parentFolderName: string
   dateCreated?: Date
   dateModified?: Date
 }

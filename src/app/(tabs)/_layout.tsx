@@ -49,7 +49,11 @@ const TabLayout = () => {
             <Feather name="folder-minus" size={24} color={color} />
           ),
         }}
-        initialParams={{ browse: "home" }}
+        initialParams={{
+          browse: ["Home"],
+          currentFolderId: 0,
+          previousFolderId: 0,
+        }}
       />
     </Tabs>
   )

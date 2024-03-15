@@ -12,51 +12,59 @@ import { FlatList, SafeAreaView } from "react-native"
 import { Note } from "@/src/types/Note"
 import { NoteFolder } from "@/src/types/NoteFolder"
 import { useEffect, useState } from "react"
+import { PATHS } from "@/src/constants/Paths"
 
 let initialDummyNotesData = [
   {
     id: 1,
     title: "First note eyuw8 wyuwefd gyuw wweeeweww",
     description: "This is description",
-    parentFolder: "home",
+    parentFolderName: "Home",
+    parentFolderId: 0,
   },
   {
     id: 2,
     title: "Second note",
     description: "This is description",
-    parentFolder: "home",
+    parentFolderName: "Home",
+    parentFolderId: 0,
   },
   {
     id: 3,
     title: "Third note",
     description: "This is description",
-    parentFolder: "home",
+    parentFolderName: "Home",
+    parentFolderId: 0,
   },
   {
     id: 4,
     title: "Fourth note",
     description:
       "This is description a very long desription ocntaining a lot of words and a long story blah blah blah and isusedtotest",
-    parentFolder: "home",
+    parentFolderName: "Home",
+    parentFolderId: 0,
   },
   {
     id: 5,
     title: "Fifth note",
     description: "",
-    parentFolder: "home",
+    parentFolderName: "Home",
+    parentFolderId: 0,
   },
   {
     id: 6,
     title: "Sixth note",
     description: "",
-    parentFolder: "home",
+    parentFolderName: "Home",
+    parentFolderId: 0,
   },
   {
-    id: 6,
+    id: 7,
     title: "Seventh note",
     description: "Hi, this is nested note",
-    parentFolder:
+    parentFolderName:
       "First folder with a super lengthy and sophisticated folder name",
+    parentFolderId: 111,
   },
 ]
 
@@ -64,38 +72,45 @@ let initialDummyFoldersData = [
   {
     id: 111,
     title: "First folder with a super lengthy and sophisticated folder name",
-    parentFolder: "home",
+    parentFolderName: "Home",
+    parentFolderId: 0,
   },
   {
     id: 112,
     title: "Second folder",
-    parentFolder: "home",
+    parentFolderName: "Home",
+    parentFolderId: 0,
   },
   {
     id: 113,
     title: "Third folder",
-    parentFolder: "home",
+    parentFolderName: "Home",
+    parentFolderId: 0,
   },
   {
     id: 114,
     title: "Fourth folder",
-    parentFolder: "home",
+    parentFolderName: "Home",
+    parentFolderId: 0,
   },
   {
     id: 115,
     title: "Fifth folder",
-    parentFolder: "home",
+    parentFolderName: "Home",
+    parentFolderId: 0,
   },
   {
     id: 116,
     title: "Sixth folder",
-    parentFolder: "home",
+    parentFolderName: "Home",
+    parentFolderId: 0,
   },
   {
     id: 117,
     title: "Folder inside first folder",
-    parentFolder:
+    parentFolderName:
       "First folder with a super lengthy and sophisticated folder name",
+    parentFolderId: 111,
   },
 ]
 
@@ -105,20 +120,20 @@ let initialDummyData: (Note | NoteFolder)[] = [
 ]
 
 const BrowseScreen = () => {
-  const { browse } = useLocalSearchParams()
+  const { browse, currentFolderId, previousFolderId } = useLocalSearchParams()
+
   const path = usePathname()
   const router = useRouter()
   const [fileList, setFileList] =
     useState<(Note | NoteFolder)[]>(initialDummyData)
 
-  const parentFolder = browse[browse.length - 1]
-  console.log(parentFolder)
+  const currentFolderName = browse[browse.length - 1]
   useEffect(() => {
     const dummyNotesData = initialDummyNotesData.filter(
-      (item) => item.parentFolder === parentFolder
+      (item) => item.parentFolderId === Number(currentFolderId)
     )
     const dummyFoldersData = initialDummyFoldersData.filter(
-      (item) => item.parentFolder === parentFolder
+      (item) => item.parentFolderId === Number(currentFolderId)
     )
     let mergedDummyData = [...dummyFoldersData, ...dummyNotesData]
     setFileList(mergedDummyData)
@@ -128,20 +143,26 @@ const BrowseScreen = () => {
     const pathArr = path.split("/")
     pathArr.pop()
     const previousPath = pathArr.join("/")
-    router.push(previousPath as any)
+    router.push({
+      pathname: previousPath as any,
+      params: {
+        currentFolderId: Number(previousFolderId),
+      },
+    })
   }
 
   return (
     <SafeAreaView>
       <Stack.Screen
         options={{
-          title: parentFolder,
+          title: currentFolderName,
           headerStyle: {
             backgroundColor: "orange",
           },
           headerLeft: () =>
-            path !== "/browse/home" ? (
+            path !== PATHS.browseTabInitialRoute ? (
               <Feather
+                style={{ paddingLeft: 16 }}
                 name="arrow-left"
                 size={24}
                 color="black"

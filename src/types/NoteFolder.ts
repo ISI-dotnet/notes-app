@@ -1,7 +1,8 @@
 export type NoteFolder = {
   id: number
   title: string
-  parentFolder: string
+  parentFolderName: string
+  parentFolderId: number
   dateCreated?: Date
   dateModified?: Date
 }

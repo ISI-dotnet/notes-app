@@ -18,7 +18,13 @@ const FolderItem = ({ folderDetails }: FolderItemProps) => {
   const router = useRouter()
   const path = usePathname()
   const handleFolderItemPress = () => {
-    router.push(`${path}/${folderDetails.title}`)
+    router.push({
+      pathname: `${path}/${folderDetails.title}` as any,
+      params: {
+        currentFolderId: folderDetails.id,
+        previousFolderId: folderDetails.parentFolderId,
+      },
+    })
   }
 
   return (

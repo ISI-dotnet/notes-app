@@ -7,12 +7,9 @@ import { SafeAreaView } from "react-native-safe-area-context"
 const FavoritesScreen = () => {
   const router = useRouter()
 
-  const handlePress = () => {
-    router.navigate(`browse/home`)
-  }
   return (
     <SafeAreaView>
-      <Text onPress={handlePress}>Favorites</Text>
+      <Text>Favorites</Text>
     </SafeAreaView>
   )
 }
