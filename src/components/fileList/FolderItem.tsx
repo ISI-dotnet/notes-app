@@ -1,12 +1,7 @@
 import { COLORS } from "@/src/constants/Colors"
 import { NoteFolder } from "@/src/types/NoteFolder"
 import { Feather, MaterialIcons } from "@expo/vector-icons"
-import {
-  Route,
-  useLocalSearchParams,
-  usePathname,
-  useRouter,
-} from "expo-router"
+import { usePathname, useRouter } from "expo-router"
 import React from "react"
 import { Text, TouchableOpacity, View } from "react-native"
 
@@ -17,6 +12,7 @@ type FolderItemProps = {
 const FolderItem = ({ folderDetails }: FolderItemProps) => {
   const router = useRouter()
   const path = usePathname()
+
   const handleFolderItemPress = () => {
     router.push({
       pathname: `${path}/${folderDetails.title}` as any,

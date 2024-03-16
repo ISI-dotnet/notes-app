@@ -28,7 +28,6 @@ const NotePage = () => {
   //TODO: change useEffect to fetch note details based on ID from DB
   useEffect(() => {
     if (id !== "0") {
-      console.log("triggered")
       const note = initialDummyNotesData.find((note) => note.id === Number(id))
       if (!note) return
       setNoteDetails(note)

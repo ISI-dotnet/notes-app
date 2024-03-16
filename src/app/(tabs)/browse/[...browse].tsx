@@ -1,9 +1,8 @@
 import FolderItem from "@/src/components/fileList/FolderItem"
 import NoteItem from "@/src/components/fileList/NoteItem"
-import { AntDesign, Feather } from "@expo/vector-icons"
+import { Feather } from "@expo/vector-icons"
 import {
   Stack,
-  useGlobalSearchParams,
   useLocalSearchParams,
   usePathname,
   useRouter,
@@ -28,6 +27,8 @@ const BrowseScreen = () => {
     useState<(Note | NoteFolder)[]>(initialDummyData)
 
   const currentFolderName = browse[browse.length - 1]
+
+  // TODO: call api to fetch notes based on currentFolderId
   useEffect(() => {
     const dummyNotesData = initialDummyNotesData.filter(
       (item) => item.parentFolderId === Number(currentFolderId)
