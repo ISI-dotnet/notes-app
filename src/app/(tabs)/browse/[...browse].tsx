@@ -2,6 +2,7 @@ import FolderItem from "@/src/components/fileList/FolderItem"
 import NoteItem from "@/src/components/fileList/NoteItem"
 import { Feather } from "@expo/vector-icons"
 import {
+  Href,
   Stack,
   useLocalSearchParams,
   usePathname,
@@ -17,6 +18,7 @@ import {
   initialDummyFoldersData,
   initialDummyNotesData,
 } from "@/src/constants/DummyData"
+import EmptyFolder from "@/src/components/fileList/EmptyFolder"
 
 const BrowseScreen = () => {
   const { browse, currentFolderId, previousFolderId } = useLocalSearchParams()
@@ -27,7 +29,6 @@ const BrowseScreen = () => {
     useState<(Note | NoteFolder)[]>(initialDummyData)
 
   const currentFolderName = browse[browse.length - 1]
-
   // TODO: call api to fetch notes based on currentFolderId
   useEffect(() => {
     const dummyNotesData = initialDummyNotesData.filter(
@@ -45,7 +46,7 @@ const BrowseScreen = () => {
     pathArr.pop()
     const previousPath = pathArr.join("/")
     router.push({
-      pathname: previousPath as any,
+      pathname: previousPath as Href<string>,
       params: {
         currentFolderId: Number(previousFolderId),
       },
@@ -53,7 +54,7 @@ const BrowseScreen = () => {
   }
 
   return (
-    <SafeAreaView>
+    <SafeAreaView className="flex-1">
       <Stack.Screen
         options={{
           title: currentFolderName,
@@ -80,20 +81,23 @@ const BrowseScreen = () => {
           ),
         }}
       />
-
-      <FlatList
-        className="pt-4 px-3"
-        contentContainerStyle={{ paddingBottom: 20 }}
-        data={fileList}
-        renderItem={({ item }) => {
-          return "description" in item ? (
-            <NoteItem noteDetails={item} />
-          ) : (
-            <FolderItem folderDetails={item} />
-          )
-        }}
-        keyExtractor={(item) => item.id.toString()}
-      />
+      {fileList.length > 0 ? (
+        <FlatList
+          className="px-3"
+          contentContainerStyle={{ paddingVertical: 20 }}
+          data={fileList}
+          renderItem={({ item }) => {
+            return "description" in item ? (
+              <NoteItem noteDetails={item} />
+            ) : (
+              <FolderItem folderDetails={item} />
+            )
+          }}
+          keyExtractor={(item) => item.id.toString()}
+        />
+      ) : (
+        <EmptyFolder />
+      )}
     </SafeAreaView>
   )
 }

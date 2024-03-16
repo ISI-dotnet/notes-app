@@ -1,7 +1,7 @@
 import { COLORS } from "@/src/constants/Colors"
 import { NoteFolder } from "@/src/types/NoteFolder"
 import { Feather, MaterialIcons } from "@expo/vector-icons"
-import { usePathname, useRouter } from "expo-router"
+import { Href, usePathname, useRouter } from "expo-router"
 import React from "react"
 import { Text, TouchableOpacity, View } from "react-native"
 
@@ -15,7 +15,7 @@ const FolderItem = ({ folderDetails }: FolderItemProps) => {
 
   const handleFolderItemPress = () => {
     router.push({
-      pathname: `${path}/${folderDetails.title}` as any,
+      pathname: `${path}/${folderDetails.title}` as Href<string>,
       params: {
         currentFolderId: folderDetails.id,
         previousFolderId: folderDetails.parentFolderId,

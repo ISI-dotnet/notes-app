@@ -44,7 +44,7 @@ const TabLayout = () => {
       <Tabs.Screen
         name="browse/[...browse]"
         options={{
-          title: "Browse",
+          tabBarLabel: "Browse",
           tabBarIcon: ({ color }) => (
             <Feather name="folder-minus" size={24} color={color} />
           ),
