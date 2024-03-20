@@ -1,6 +1,7 @@
 import { Stack } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
+import { auth } from "@/firebaseConfig";
 import {
   Animated,
   Keyboard,
@@ -76,8 +77,8 @@ const Note = () => {
       await addDoc(collection(db, "notes"), {
         title: title,
         description: description,
+        user: auth.currentUser?.uid,
       });
-      // console.log("Document written with ID: ", docRef.id);
     } catch (error) {
       console.log(error.message);
     }
