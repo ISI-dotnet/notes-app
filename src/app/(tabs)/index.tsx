@@ -1,11 +1,14 @@
-import { COLORS } from "@/src/constants/Colors"
-import { AntDesign } from "@expo/vector-icons"
-import { Link } from "expo-router"
-import { View, Text, Pressable } from "react-native"
+import { auth } from "@/firebaseConfig";
+import { COLORS } from "@/src/constants/Colors";
+import { AntDesign } from "@expo/vector-icons";
+import { Link } from "expo-router";
+import { View, Text, Pressable } from "react-native";
 
 const HomeScreen = () => {
+  const user = auth.currentUser;
   return (
     <View className="flex-1">
+      <Text>Welcome {user?.getIdToken}</Text>
       <Text className="">Home Screen</Text>
       <Link href={"/note/"} asChild>
         <Pressable
@@ -20,7 +23,7 @@ const HomeScreen = () => {
         </Pressable>
       </Link>
     </View>
-  )
-}
+  );
+};
 
-export default HomeScreen
+export default HomeScreen;

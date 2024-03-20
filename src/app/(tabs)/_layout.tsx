@@ -1,7 +1,7 @@
-import { COLORS } from "@/src/constants/Colors"
-import { Feather } from "@expo/vector-icons"
-import { Tabs } from "expo-router"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { COLORS } from "@/src/constants/Colors";
+import { Feather } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 
 const TabLayout = () => {
@@ -53,9 +53,18 @@ const TabLayout = () => {
             ),
           }}
         />
+        <Tabs.Screen
+          name="user"
+          options={{
+            title: "User",
+            tabBarIcon: ({ color }) => (
+              <Feather name="heart" size={24} color={color} />
+            ),
+          }}
+        />
       </Tabs>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default TabLayout
+export default TabLayout;
