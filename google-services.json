@@ -1,0 +1,29 @@
+{
+    "project_info": {
+      "project_number": "683996676974",
+      "project_id": "vu-noteapp-v2",
+      "storage_bucket": "vu-noteapp-v2.appspot.com"
+    },
+    "client": [
+      {
+        "client_info": {
+          "mobilesdk_app_id": "1:683996676974:android:e3e50105f4fccae6a3777f",
+          "android_client_info": {
+            "package_name": "com.anonymous.notesapp"
+          }
+        },
+        "oauth_client": [],
+        "api_key": [
+          {
+            "current_key": "AIzaSyC_A0Ov-pIP4wN2tuq3WuEwR4fvYLADcuE"
+          }
+        ],
+        "services": {
+          "appinvite_service": {
+            "other_platform_oauth_client": []
+          }
+        }
+      }
+    ],
+    "configuration_version": "1"
+  }

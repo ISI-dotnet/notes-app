@@ -10,18 +10,21 @@ import {
   Text,
   TextInput,
   View,
+  Button,
 } from "react-native"
 import { actions, RichEditor, RichToolbar } from "react-native-pell-rich-editor"
 import { COLORS } from "@/src/constants/Colors"
 import { useTheme } from "@react-navigation/native"
 import Toolbar from "@/src/components/note/Toolbar"
 import RichTextEditor from "@/src/components/note/RichTextEditor"
+import db from "@react-native-firebase/database"
 
 const Note = () => {
   const richText = useRef<RichEditor | null>(null)
   const scrollRef = useRef<ScrollView | null>(null)
 
   const [title, setTitle] = useState("")
+  const [description, setDescription] = useState("")
   const [isFocused, setIsFocused] = useState(false)
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
 
@@ -47,6 +50,21 @@ const Note = () => {
     }
   }, [])
 
+  const saveToDatabase = () => {
+    // Assuming you have a 'notes' node in your database
+    const newNoteRef = db().ref('notes').push();
+    newNoteRef.set({
+      title: title,
+      description: description,
+    }, (error) => {
+      if (error) {
+        console.error('Error saving data:', error);
+      } else {
+        console.log('Data saved successfully');
+      }
+    });
+  };
+
   // When note is long enough not not fit in screen, scroll the note by 30px when entering new line
   const handleScroll = (scrollY: number) => {
     // Only trigger scrolling if the RichEditor is focused
@@ -57,6 +75,7 @@ const Note = () => {
       })
     }
   }
+
   return (
     <View className="flex-1">
       <Stack.Screen
@@ -65,7 +84,12 @@ const Note = () => {
           headerStyle: {
             backgroundColor: "orange",
           },
-          headerRight: () => <AntDesign name="check" size={24} color="black" />,
+          headerRight: () => (
+            <Button
+              onPress={saveToDatabase}
+              title="Save"
+            />
+          ),
         }}
       />
       <ScrollView
@@ -99,4 +123,4 @@ const Note = () => {
   )
 }
 
-export default Note
+export default Note;

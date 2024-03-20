@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyDvyt9HxB5Rrp1DOMwEJeOCego2z47-dIQ</string>
+	<key>GCM_SENDER_ID</key>
+	<string>683996676974</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.anonymous.notesapp</string>
+	<key>PROJECT_ID</key>
+	<string>vu-noteapp-v2</string>
+	<key>STORAGE_BUCKET</key>
+	<string>vu-noteapp-v2.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:683996676974:ios:92a1380c5c405d91a3777f</string>
+	<key>DATABASE_URL</key>
+	<string>https://vu-noteapp-v2-default-rtdb.europe-west1.firebasedatabase.app</string>
+</dict>
+</plist>
