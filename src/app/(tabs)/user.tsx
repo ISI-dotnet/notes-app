@@ -1,38 +1,38 @@
-import { auth } from "@/firebaseConfig";
-import { signOut } from "@firebase/auth";
-import { router } from "expo-router";
-import React, { useEffect } from "react";
-import { Button, Text, View, StyleSheet } from "react-native";
+import { auth } from "@/firebaseConfig"
+import { signOut } from "@firebase/auth"
+import { router } from "expo-router"
+import React, { useEffect } from "react"
+import { Button, Text, View, StyleSheet } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 const Page = () => {
-  const user = auth.currentUser;
+  const user = auth.currentUser
   const handleAuthentication = async () => {
     try {
       if (user) {
         // If user is already authenticated, log out
-        console.log("User logged out successfully!");
-        await signOut(auth);
-        router.replace("/");
+        console.log("User logged out successfully!")
+        await signOut(auth)
+        router.replace("/")
       }
     } catch (error) {
-      console.error("Authentication error:", error.message);
+      console.error("Authentication error:", error.message)
     }
-  };
+  }
 
   return (
-    <View style={styles.authContainer}>
+    <SafeAreaView className="flex-1">
       <Text style={styles.title}>Welcome</Text>
       <Text style={styles.emailText}>{user?.email}</Text>
       <Button title="Logout" onPress={handleAuthentication} color="#e74c3c" />
-    </View>
-  );
-};
+    </SafeAreaView>
+  )
+}
 
-export default Page;
+export default Page
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
@@ -74,4 +74,4 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
-});
+})

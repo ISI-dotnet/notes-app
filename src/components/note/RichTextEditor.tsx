@@ -1,17 +1,17 @@
-import { COLORS } from "@/src/constants/Colors";
-import { useTheme } from "@react-navigation/native";
-import { forwardRef } from "react";
-import { RichEditor } from "react-native-pell-rich-editor";
+import { COLORS } from "@/src/constants/Colors"
+import { useTheme } from "@react-navigation/native"
+import { forwardRef } from "react"
+import { RichEditor } from "react-native-pell-rich-editor"
 
 type RichTextEditorProps = {
-  setIsFocused: React.Dispatch<React.SetStateAction<boolean>>;
-  handleScroll(scrollY: number): void;
-  handleChange(descriptionText: string): void;
-};
+  setIsFocused: React.Dispatch<React.SetStateAction<boolean>>
+  handleScroll(scrollY: number): void
+  handleChange(descriptionText: string): void
+}
 
 const RichTextEditor = forwardRef<RichEditor, RichTextEditorProps>(
   ({ setIsFocused, handleScroll, handleChange }, ref) => {
-    const { colors } = useTheme();
+    const { colors } = useTheme()
     return (
       <RichEditor
         showsVerticalScrollIndicator={false}
@@ -25,13 +25,13 @@ const RichTextEditor = forwardRef<RichEditor, RichTextEditorProps>(
         ref={ref}
         onChange={handleChange}
         onFocus={() => {
-          setIsFocused(true);
+          setIsFocused(true)
         }}
         onBlur={() => setIsFocused(false)}
         onCursorPosition={(scrollY) => handleScroll(scrollY)}
       />
-    );
+    )
   }
-);
+)
 
-export default RichTextEditor;
+export default RichTextEditor
