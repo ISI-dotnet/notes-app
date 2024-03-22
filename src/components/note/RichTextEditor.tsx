@@ -4,13 +4,13 @@ import { forwardRef } from "react"
 import { RichEditor } from "react-native-pell-rich-editor"
 
 type RichTextEditorProps = {
-  description?: string
   setIsFocused: React.Dispatch<React.SetStateAction<boolean>>
   handleScroll(scrollY: number): void
+  handleChange(descriptionText: string): void
 }
 
 const RichTextEditor = forwardRef<RichEditor, RichTextEditorProps>(
-  ({ description, setIsFocused, handleScroll }, ref) => {
+  ({ setIsFocused, handleScroll, handleChange }, ref) => {
     const { colors } = useTheme()
     return (
       <RichEditor
@@ -23,10 +23,7 @@ const RichTextEditor = forwardRef<RichEditor, RichTextEditorProps>(
           caretColor: COLORS.darkOrange,
         }}
         ref={ref}
-        initialContentHTML={description ? description : ""}
-        onChange={(descriptionText) => {
-          console.log("descriptionText:", descriptionText)
-        }}
+        onChange={handleChange}
         onFocus={() => {
           setIsFocused(true)
         }}

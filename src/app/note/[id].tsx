@@ -14,6 +14,8 @@ import Toolbar from "@/src/components/note/Toolbar"
 import RichTextEditor from "@/src/components/note/RichTextEditor"
 import { Note } from "@/src/types/Note"
 import { initialDummyNotesData } from "@/src/constants/DummyData"
+import { auth, db } from "@/firebaseConfig"
+import { collection, addDoc } from "firebase/firestore"
 
 const NotePage = () => {
   const { id } = useLocalSearchParams()
@@ -39,6 +41,26 @@ const NotePage = () => {
 
   const [isFocused, setIsFocused] = useState(false)
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
+
+  const handleDescriptionChange = (descriptionText: string) => {
+    setNoteDetails((oldValue) => ({
+      ...oldValue,
+      description: descriptionText,
+    }))
+  }
+
+  const handleSubmit = async () => {
+    try {
+      console.log(noteDetails.title, noteDetails.description)
+      await addDoc(collection(db, "notes"), {
+        title: noteDetails.title,
+        description: noteDetails.description,
+        user: auth.currentUser?.uid,
+      })
+    } catch (error) {
+      console.log(error.message)
+    }
+  }
 
   // effect used for showing and hiding note styling toolbar based on keyboard visibility on screen
   useEffect(() => {
@@ -80,7 +102,14 @@ const NotePage = () => {
           headerStyle: {
             backgroundColor: "orange",
           },
-          headerRight: () => <AntDesign name="check" size={24} color="black" />,
+          headerRight: () => (
+            <AntDesign
+              name="check"
+              size={24}
+              color="black"
+              onPress={handleSubmit}
+            />
+          ),
         }}
       />
       <ScrollView
@@ -105,7 +134,7 @@ const NotePage = () => {
           />
 
           <RichTextEditor
-            description={noteDetails.description}
+            handleChange={handleDescriptionChange}
             ref={richText}
             setIsFocused={setIsFocused}
             handleScroll={handleScroll}

@@ -55,6 +55,16 @@ const TabLayout = () => {
           previousFolderId: 0,
         }}
       />
+      <Tabs.Screen
+        name="user"
+        options={{
+          headerShown: false,
+          title: "User",
+          tabBarIcon: ({ color }) => (
+            <Feather name="heart" size={24} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   )
 }
