@@ -21,6 +21,7 @@ import {
 import EmptyFolder from "@/src/components/fileList/EmptyFolder"
 import { auth } from "@/firebaseConfig"
 import { getNotes } from "@/src/api/note/note"
+import { getFolders } from "@/src/api/note/folder"
 
 const BrowseScreen = () => {
   const { browse, currentFolderId, previousFolderId } = useLocalSearchParams()
@@ -35,18 +36,22 @@ const BrowseScreen = () => {
   const currentFolderName = browse[browse.length - 1]
   // TODO: call api to fetch notes based on currentFolderId
   useEffect(() => {
-    // TODO: do some logging and see curentFolderId array to avoid using as
-    getNotes(user!.uid, currentFolderId as string).then((notesArr) =>
-      setFileList(notesArr)
-    )
+    const fetchData = async () => {
+      try {
+        // Fetch notes and folders concurrently
+        const [notesArr, foldersArr] = await Promise.all([
+          getNotes(user!.uid, currentFolderId as string),
+          getFolders(user!.uid, currentFolderId as string),
+        ])
 
-    const dummyNotesData = initialDummyNotesData.filter(
-      (item) => item.parentFolderId === Number(currentFolderId)
-    )
-    const dummyFoldersData = initialDummyFoldersData.filter(
-      (item) => item.parentFolderId === Number(currentFolderId)
-    )
-    let mergedDummyData = [...dummyFoldersData, ...dummyNotesData]
+        // Update fileList state after both promises have resolved
+        setFileList([...foldersArr, ...notesArr])
+      } catch (error) {
+        console.error("Error fetching data:", error)
+      }
+    }
+
+    fetchData()
   }, [path])
 
   const handleNavigateBackFolder = () => {
