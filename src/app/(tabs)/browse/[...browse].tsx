@@ -19,9 +19,13 @@ import {
   initialDummyNotesData,
 } from "@/src/constants/DummyData"
 import EmptyFolder from "@/src/components/fileList/EmptyFolder"
+import { auth } from "@/firebaseConfig"
+import { getNotes } from "@/src/api/note/note"
 
 const BrowseScreen = () => {
   const { browse, currentFolderId, previousFolderId } = useLocalSearchParams()
+
+  const user = auth.currentUser
 
   const path = usePathname()
   const router = useRouter()
@@ -31,6 +35,11 @@ const BrowseScreen = () => {
   const currentFolderName = browse[browse.length - 1]
   // TODO: call api to fetch notes based on currentFolderId
   useEffect(() => {
+    // TODO: do some logging and see curentFolderId array to avoid using as
+    getNotes(user!.uid, currentFolderId as string).then((notesArr) =>
+      setFileList(notesArr)
+    )
+
     const dummyNotesData = initialDummyNotesData.filter(
       (item) => item.parentFolderId === Number(currentFolderId)
     )
@@ -38,7 +47,6 @@ const BrowseScreen = () => {
       (item) => item.parentFolderId === Number(currentFolderId)
     )
     let mergedDummyData = [...dummyFoldersData, ...dummyNotesData]
-    setFileList(mergedDummyData)
   }, [path])
 
   const handleNavigateBackFolder = () => {
@@ -84,7 +92,7 @@ const BrowseScreen = () => {
       {fileList.length > 0 ? (
         <FlatList
           className="px-3"
-          contentContainerStyle={{ paddingVertical: 20 }}
+          contentContainerStyle={{ paddingHorizontal: 15, paddingVertical: 20 }}
           data={fileList}
           renderItem={({ item }) => {
             return "description" in item ? (

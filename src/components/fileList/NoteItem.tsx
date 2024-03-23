@@ -15,7 +15,7 @@ const NoteItem = ({ noteDetails }: NoteItemProps) => {
   }
   return (
     <TouchableOpacity
-      className="flex-row items-center bg-white rounded-lg my-1 px-2 py-3 h-20"
+      className="flex-row items-center bg-white rounded-lg my-1 px-2 h-20"
       onPress={handleNoteItemPress}
     >
       <View className="mr-3">

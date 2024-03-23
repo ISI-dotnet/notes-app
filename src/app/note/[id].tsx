@@ -1,4 +1,4 @@
-import { Stack, useLocalSearchParams } from "expo-router"
+import { Stack, useLocalSearchParams, router } from "expo-router"
 import { AntDesign } from "@expo/vector-icons"
 import React, { useEffect, useRef, useState } from "react"
 import {
@@ -14,8 +14,7 @@ import Toolbar from "@/src/components/note/Toolbar"
 import RichTextEditor from "@/src/components/note/RichTextEditor"
 import { Note } from "@/src/types/Note"
 import { initialDummyNotesData } from "@/src/constants/DummyData"
-import { auth, db } from "@/firebaseConfig"
-import { collection, addDoc } from "firebase/firestore"
+import { auth } from "@/firebaseConfig"
 import { createNote } from "@/src/api/note/note"
 
 const NotePage = () => {
@@ -43,16 +42,9 @@ const NotePage = () => {
   const [isFocused, setIsFocused] = useState(false)
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
 
-  const handleDescriptionChange = (descriptionText: string) => {
-    setNoteDetails((oldValue) => ({
-      ...oldValue,
-      description: descriptionText,
-    }))
-  }
-
   const handleSubmit = () => {
     createNote(noteDetails)
-      .then((newNoteRef) => console.log(newNoteRef))
+      .then(() => router.back())
       .catch((error) => console.log(error))
   }
 
@@ -128,7 +120,12 @@ const NotePage = () => {
           />
 
           <RichTextEditor
-            handleChange={handleDescriptionChange}
+            handleChange={(descriptionText) =>
+              setNoteDetails((oldValue) => ({
+                ...oldValue,
+                description: descriptionText,
+              }))
+            }
             ref={richText}
             setIsFocused={setIsFocused}
             handleScroll={handleScroll}
