@@ -16,15 +16,16 @@ import { Note } from "@/src/types/Note"
 import { initialDummyNotesData } from "@/src/constants/DummyData"
 import { auth, db } from "@/firebaseConfig"
 import { collection, addDoc } from "firebase/firestore"
+import { createNote } from "@/src/api/note/note"
 
 const NotePage = () => {
   const { id } = useLocalSearchParams()
-  const [noteDetails, setNoteDetails] = useState<Note>({
-    id: 0,
+  const [noteDetails, setNoteDetails] = useState<Omit<Note, "id"> | Note>({
+    userId: auth.currentUser!.uid,
     title: "",
     description: "",
     parentFolderName: "Home",
-    parentFolderId: 0,
+    parentFolderId: "home",
   })
 
   //TODO: change useEffect to fetch note details based on ID from DB
@@ -32,7 +33,7 @@ const NotePage = () => {
     if (id !== "0") {
       const note = initialDummyNotesData.find((note) => note.id === Number(id))
       if (!note) return
-      setNoteDetails(note)
+      // setNoteDetails(note)
     }
   }, [])
 
@@ -49,17 +50,10 @@ const NotePage = () => {
     }))
   }
 
-  const handleSubmit = async () => {
-    try {
-      console.log(noteDetails.title, noteDetails.description)
-      await addDoc(collection(db, "notes"), {
-        title: noteDetails.title,
-        description: noteDetails.description,
-        user: auth.currentUser?.uid,
-      })
-    } catch (error) {
-      console.log(error.message)
-    }
+  const handleSubmit = () => {
+    createNote(noteDetails)
+      .then((newNoteRef) => console.log(newNoteRef))
+      .catch((error) => console.log(error))
   }
 
   // effect used for showing and hiding note styling toolbar based on keyboard visibility on screen

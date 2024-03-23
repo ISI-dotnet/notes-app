@@ -1,8 +1,9 @@
 export type Note = {
-  id: number
+  id: string
+  userId: string
   title: string
   description: string
-  parentFolderId: number
+  parentFolderId: string
   parentFolderName: string
   dateCreated?: Date
   dateModified?: Date
