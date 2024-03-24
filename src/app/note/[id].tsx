@@ -29,21 +29,6 @@ const NotePage = () => {
     parentFolderId: "home",
   })
 
-  //TODO: change useEffect to fetch note details based on ID from DB
-  useEffect(() => {
-    const getNoteDetails = async () => {
-      if (id !== "0") {
-        setIsLoading(true)
-        const note = await getNoteById(id as string)
-        setNoteDetails(note)
-        setIsLoading(false)
-      }
-    }
-
-    getNoteDetails()
-  }, [])
-  console.log(noteDetails)
-
   const richText = useRef<RichEditor | null>(null)
   const scrollRef = useRef<ScrollView | null>(null)
 
@@ -55,6 +40,20 @@ const NotePage = () => {
       .then(() => router.back())
       .catch((error) => console.log(error))
   }
+
+  useEffect(() => {
+    const getNoteDetails = async () => {
+      if (id !== "0") {
+        setIsLoading(true)
+        const note = await getNoteById(id as string)
+        setNoteDetails(note)
+        setTimeout(() => {}, 500)
+        setIsLoading(false)
+      }
+    }
+
+    getNoteDetails()
+  }, [])
 
   // effect used for showing and hiding note styling toolbar based on keyboard visibility on screen
   useEffect(() => {

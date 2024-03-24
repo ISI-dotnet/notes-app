@@ -15,7 +15,6 @@ const BrowseScreen = () => {
 
   const path = usePathname()
   const router = useRouter()
-  console.log(path)
   const currentFolderName = browse[browse.length - 1]
 
   const handleNavigateBackFolder = () => {

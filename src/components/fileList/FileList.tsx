@@ -9,15 +9,20 @@ import { FlatList } from "react-native"
 import NoteItem from "./NoteItem"
 import FolderItem from "./FolderItem"
 import EmptyFolder from "./EmptyFolder"
+import { useLoader } from "@/src/context/useLoader"
+import Loader from "../Loader"
 
 const FileList = () => {
   const { currentFolderId } = useLocalSearchParams()
+  const { loading, setIsLoading } = useLoader()
+
   const [fileList, setFileList] = useState<(Note | NoteFolder)[]>([])
   const user = auth.currentUser
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setIsLoading(true)
         // Fetch notes and folders concurrently
         const [notesArr, foldersArr] = await Promise.all([
           getNotes(user!.uid, currentFolderId as string),
@@ -28,12 +33,16 @@ const FileList = () => {
         setFileList([...foldersArr, ...notesArr])
       } catch (error) {
         console.error("Error fetching data:", error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
     fetchData()
-  }, [currentFolderId])
-  return fileList.length > 0 ? (
+  }, [])
+  return loading ? (
+    <Loader />
+  ) : fileList.length > 0 ? (
     <FlatList
       className="p-3"
       data={fileList}
