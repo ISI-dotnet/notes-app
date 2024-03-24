@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"
 import {
   View,
   Text,
@@ -6,53 +6,52 @@ import {
   Button,
   StyleSheet,
   ScrollView,
-} from "react-native";
+} from "react-native"
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
-} from "@firebase/auth";
-import { app } from "@/firebaseConfig";
-import { router } from "expo-router";
+} from "@firebase/auth"
+import { app } from "@/firebaseConfig"
+import { router } from "expo-router"
 
 const App = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null); // Track user authentication state
-  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [user, setUser] = useState(null) // Track user authentication state
+  const [isLogin, setIsLogin] = useState(true)
 
-  const auth = getAuth(app);
+  const auth = getAuth(app)
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-    });
+      setUser(user)
+    })
 
-    return () => unsubscribe();
-  }, [auth, user]);
+    return () => unsubscribe()
+  }, [auth, user])
 
   const handleAuthentication = async () => {
     try {
       if (isLogin) {
         // Sign in
-        await signInWithEmailAndPassword(auth, email, password);
-        router.replace("/(tabs)/");
+        await signInWithEmailAndPassword(auth, email, password)
+        router.replace("/(tabs)/")
       } else {
         // Sign up
-        await createUserWithEmailAndPassword(auth, email, password);
-        console.log("User created successfully!");
+        await createUserWithEmailAndPassword(auth, email, password)
+        console.log("User created successfully!")
         // router.push("/browse")
       }
     } catch (error) {
-      console.error("Authentication error:", error.message);
+      console.error("Authentication error:", error.message)
     }
-  };
+  }
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.authContainer}>
         <Text style={styles.title}>{isLogin ? "Sign In" : "Sign Up"}</Text>
-
         <TextInput
           style={styles.input}
           value={email}
@@ -84,10 +83,10 @@ const App = () => {
         </View>
       </View>
     </ScrollView>
-  );
-};
+  )
+}
 
-export default App;
+export default App
 
 const styles = StyleSheet.create({
   container: {
@@ -133,4 +132,4 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
-});
+})

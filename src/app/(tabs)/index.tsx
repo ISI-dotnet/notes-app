@@ -2,14 +2,32 @@ import { auth } from "@/firebaseConfig"
 import { COLORS } from "@/src/constants/Colors"
 import { AntDesign } from "@expo/vector-icons"
 import { Link } from "expo-router"
-import { Text, Pressable } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { useEffect, useState } from "react"
+import { View, Text, Pressable, SafeAreaView } from "react-native"
 
 const HomeScreen = () => {
-  const user = auth.currentUser
+  const [username, setUsername] = useState("")
+
+  useEffect(() => {
+    const fetchUsername = async () => {
+      const user = auth.currentUser
+      const username = await user?.getIdToken()
+      setUsername(username!)
+    }
+
+    fetchUsername()
+  }, [])
+
+  if (username === "")
+    return (
+      <View>
+        <Text>Hi</Text>
+      </View>
+    )
+
   return (
     <SafeAreaView className="flex-1">
-      <Text>Welcome {user?.getIdToken}</Text>
+      <Text>Welcome {username}</Text>
       <Text className="">Home Screen</Text>
       <Link href={"/note/0"} asChild>
         <Pressable

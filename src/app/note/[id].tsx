@@ -13,7 +13,6 @@ import { RichEditor } from "react-native-pell-rich-editor"
 import Toolbar from "@/src/components/note/Toolbar"
 import RichTextEditor from "@/src/components/note/RichTextEditor"
 import { Note } from "@/src/types/Note"
-import { initialDummyNotesData } from "@/src/constants/DummyData"
 import { auth } from "@/firebaseConfig"
 import { createNote } from "@/src/api/note/note"
 
@@ -30,8 +29,7 @@ const NotePage = () => {
   //TODO: change useEffect to fetch note details based on ID from DB
   useEffect(() => {
     if (id !== "0") {
-      const note = initialDummyNotesData.find((note) => note.id === Number(id))
-      if (!note) return
+      // if (!note) return
       // setNoteDetails(note)
     }
   }, [])

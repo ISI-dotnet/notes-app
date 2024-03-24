@@ -1,5 +1,5 @@
 import { Note } from "@/src/types/Note"
-import { auth, db } from "@/firebaseConfig"
+import { db } from "@/firebaseConfig"
 import {
   collection,
   addDoc,

@@ -2,6 +2,7 @@ import { Text, TouchableOpacity, View } from "react-native"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { Note } from "@/src/types/Note"
 import { useRouter } from "expo-router"
+import { memo } from "react"
 type NoteItemProps = {
   noteDetails: Note
 }
@@ -42,4 +43,4 @@ const NoteItem = ({ noteDetails }: NoteItemProps) => {
   )
 }
 
-export default NoteItem
+export default memo(NoteItem)
