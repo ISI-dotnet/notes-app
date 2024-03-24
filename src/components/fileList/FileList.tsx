@@ -15,8 +15,6 @@ const FileList = () => {
   const [fileList, setFileList] = useState<(Note | NoteFolder)[]>([])
   const user = auth.currentUser
 
-  console.log(fileList)
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -37,8 +35,7 @@ const FileList = () => {
   }, [currentFolderId])
   return fileList.length > 0 ? (
     <FlatList
-      className="px-3"
-      contentContainerStyle={{ paddingVertical: 20 }}
+      className="p-3"
       data={fileList}
       renderItem={({ item }) => {
         return "description" in item ? (

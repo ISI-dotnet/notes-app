@@ -7,6 +7,8 @@ import {
   query,
   where,
   getDocs,
+  getDoc,
+  doc,
 } from "firebase/firestore"
 
 export const createNote = async (
@@ -18,7 +20,9 @@ export const createNote = async (
     dateModified: serverTimestamp(),
   })
     .then((docRef) => docRef)
-    .catch((error) => error)
+    .catch((error) => {
+      throw error
+    })
 }
 
 export const getNotes = async (userId: string, parentFolderId: string) => {
@@ -37,5 +41,22 @@ export const getNotes = async (userId: string, parentFolderId: string) => {
       })
       return notes
     })
-    .catch((error) => error)
+    .catch((error) => {
+      throw error
+    })
+}
+
+export const getNoteById = async (noteId: string) => {
+  const notesRef = doc(db, "notes", noteId)
+
+  return getDoc(notesRef)
+    .then((noteDoc) => {
+      if (!noteDoc.exists()) {
+        throw new Error("Note not found")
+      }
+      return { id: noteId, ...noteDoc.data() } as Note
+    })
+    .catch((error) => {
+      throw error
+    })
 }

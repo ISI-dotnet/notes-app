@@ -1,7 +1,8 @@
 import { auth } from "@/firebaseConfig"
 import { signOut } from "@firebase/auth"
 import { router } from "expo-router"
-import { Button, Text, StyleSheet, SafeAreaView } from "react-native"
+import { Button, Text, StyleSheet } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 const Page = () => {
   const user = auth.currentUser

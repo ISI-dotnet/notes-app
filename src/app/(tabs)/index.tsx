@@ -3,7 +3,8 @@ import { COLORS } from "@/src/constants/Colors"
 import { AntDesign } from "@expo/vector-icons"
 import { Link } from "expo-router"
 import { useEffect, useState } from "react"
-import { View, Text, Pressable, SafeAreaView } from "react-native"
+import { View, Text, Pressable } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 const HomeScreen = () => {
   const [username, setUsername] = useState("")

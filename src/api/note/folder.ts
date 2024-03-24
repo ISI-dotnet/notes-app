@@ -18,5 +18,7 @@ export const getFolders = async (userId: string, parentFolderId: string) => {
       })
       return folders
     })
-    .catch((error) => error)
+    .catch((error) => {
+      throw error
+    })
 }

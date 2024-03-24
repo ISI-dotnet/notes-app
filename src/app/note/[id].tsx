@@ -14,10 +14,13 @@ import Toolbar from "@/src/components/note/Toolbar"
 import RichTextEditor from "@/src/components/note/RichTextEditor"
 import { Note } from "@/src/types/Note"
 import { auth } from "@/firebaseConfig"
-import { createNote } from "@/src/api/note/note"
+import { createNote, getNoteById } from "@/src/api/note/note"
+import { useLoader } from "@/src/context/useLoader"
+import Loader from "@/src/components/Loader"
 
 const NotePage = () => {
   const { id } = useLocalSearchParams()
+  const { loading, setIsLoading } = useLoader()
   const [noteDetails, setNoteDetails] = useState<Omit<Note, "id"> | Note>({
     userId: auth.currentUser!.uid,
     title: "",
@@ -28,11 +31,18 @@ const NotePage = () => {
 
   //TODO: change useEffect to fetch note details based on ID from DB
   useEffect(() => {
-    if (id !== "0") {
-      // if (!note) return
-      // setNoteDetails(note)
+    const getNoteDetails = async () => {
+      if (id !== "0") {
+        setIsLoading(true)
+        const note = await getNoteById(id as string)
+        setNoteDetails(note)
+        setIsLoading(false)
+      }
     }
+
+    getNoteDetails()
   }, [])
+  console.log(noteDetails)
 
   const richText = useRef<RichEditor | null>(null)
   const scrollRef = useRef<ScrollView | null>(null)
@@ -96,40 +106,46 @@ const NotePage = () => {
           ),
         }}
       />
-      <ScrollView
-        keyboardShouldPersistTaps="always"
-        className="flex-1"
-        ref={scrollRef}
-        nestedScrollEnabled={true}
-      >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+      {loading ? (
+        <Loader />
+      ) : (
+        <ScrollView
+          keyboardShouldPersistTaps="always"
+          className="flex-1"
+          ref={scrollRef}
+          nestedScrollEnabled={true}
         >
-          <TextInput
-            className="text-2xl p-4 font-medium"
-            placeholder="Title"
-            maxLength={200}
-            value={noteDetails.title}
-            onChangeText={(text) =>
-              setNoteDetails((oldValue) => ({ ...oldValue, title: text }))
-            }
-            selectionColor={"orange"}
-            multiline={true}
-          />
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+          >
+            <TextInput
+              className="text-2xl p-4 font-medium"
+              placeholder="Title"
+              maxLength={200}
+              value={noteDetails.title}
+              onChangeText={(text) =>
+                setNoteDetails((oldValue) => ({ ...oldValue, title: text }))
+              }
+              selectionColor={"orange"}
+              multiline={true}
+            />
 
-          <RichTextEditor
-            handleChange={(descriptionText) =>
-              setNoteDetails((oldValue) => ({
-                ...oldValue,
-                description: descriptionText,
-              }))
-            }
-            ref={richText}
-            setIsFocused={setIsFocused}
-            handleScroll={handleScroll}
-          />
-        </KeyboardAvoidingView>
-      </ScrollView>
+            <RichTextEditor
+              handleChange={(descriptionText) =>
+                setNoteDetails((oldValue) => ({
+                  ...oldValue,
+                  description: descriptionText,
+                }))
+              }
+              ref={richText}
+              setIsFocused={setIsFocused}
+              handleScroll={handleScroll}
+              noteDescription={noteDetails.description}
+            />
+          </KeyboardAvoidingView>
+        </ScrollView>
+      )}
+
       {/* Toolbar is only visible on note description and when the keyboard is open */}
       {isFocused && isKeyboardVisible && <Toolbar editor={richText} />}
     </View>

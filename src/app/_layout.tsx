@@ -5,6 +5,7 @@ import { Stack } from "expo-router"
 import * as SplashScreen from "expo-splash-screen"
 import { useEffect } from "react"
 import { ThemeProvider } from "@react-navigation/native"
+import { LoaderProvider } from "../context/LoaderContext"
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -58,9 +59,11 @@ const MyTheme = {
 function RootLayoutNav() {
   return (
     <ThemeProvider value={MyTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
+      <LoaderProvider>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+      </LoaderProvider>
     </ThemeProvider>
   )
 }
