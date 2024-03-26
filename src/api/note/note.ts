@@ -9,6 +9,7 @@ import {
   getDocs,
   getDoc,
   doc,
+  setDoc,
 } from "firebase/firestore"
 
 export const createNote = async (
@@ -22,6 +23,16 @@ export const createNote = async (
     .then((docRef) => docRef)
     .catch((error) => {
       throw error
+    })
+}
+
+export const updateNote = async (noteDetails: Note) => {
+  noteDetails.dateModified = new Date()
+
+  return setDoc(doc(db, "notes", noteDetails.id), noteDetails, { merge: true })
+    .then(() => "Note updated successfully")
+    .catch((error) => {
+      throw new Error("Error updating note: " + error.message)
     })
 }
 

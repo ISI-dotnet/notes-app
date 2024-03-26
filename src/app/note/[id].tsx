@@ -14,12 +14,12 @@ import Toolbar from "@/src/components/note/Toolbar"
 import RichTextEditor from "@/src/components/note/RichTextEditor"
 import { Note } from "@/src/types/Note"
 import { auth } from "@/firebaseConfig"
-import { createNote, getNoteById } from "@/src/api/note/note"
+import { createNote, getNoteById, updateNote } from "@/src/api/note/note"
 import { useLoader } from "@/src/context/useLoader"
 import Loader from "@/src/components/Loader"
 
 const NotePage = () => {
-  const { id } = useLocalSearchParams()
+  const { id }: { id: string } = useLocalSearchParams()
   const { loading, setIsLoading } = useLoader()
   const [noteDetails, setNoteDetails] = useState<Omit<Note, "id"> | Note>({
     userId: auth.currentUser!.uid,
@@ -35,17 +35,25 @@ const NotePage = () => {
   const [isFocused, setIsFocused] = useState(false)
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
 
+  // TODO: handle errors with toast, modal or smth
   const handleSubmit = () => {
-    createNote(noteDetails)
-      .then(() => router.back())
-      .catch((error) => console.log(error))
+    if (id !== "0") {
+      const updatedNote = { id: id, ...noteDetails }
+      updateNote(updatedNote)
+        .then(() => router.back())
+        .catch((error) => console.log(error))
+    } else {
+      createNote(noteDetails)
+        .then(() => router.back())
+        .catch((error) => console.log(error))
+    }
   }
 
   useEffect(() => {
     const getNoteDetails = async () => {
       if (id !== "0") {
         setIsLoading(true)
-        const note = await getNoteById(id as string)
+        const note = await getNoteById(id)
         setNoteDetails(note)
         setTimeout(() => {}, 500)
         setIsLoading(false)
