@@ -45,6 +45,7 @@ const FileList = () => {
   ) : fileList.length > 0 ? (
     <FlatList
       className="p-3"
+      contentContainerStyle={{ paddingBottom: 20 }}
       data={fileList}
       renderItem={({ item }) => {
         return "description" in item ? (

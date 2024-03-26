@@ -12,7 +12,6 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   onAuthStateChanged,
-  signOut,
 } from "@firebase/auth"
 import { app } from "@/firebaseConfig"
 import { router } from "expo-router"
