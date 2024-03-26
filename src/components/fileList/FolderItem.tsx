@@ -2,7 +2,7 @@ import { COLORS } from "@/src/constants/Colors"
 import { NoteFolder } from "@/src/types/NoteFolder"
 import { Feather, MaterialIcons } from "@expo/vector-icons"
 import { Href, usePathname, useRouter } from "expo-router"
-import React from "react"
+import React, { memo } from "react"
 import { Text, TouchableOpacity, View } from "react-native"
 
 type FolderItemProps = {
@@ -44,4 +44,4 @@ const FolderItem = ({ folderDetails }: FolderItemProps) => {
   )
 }
 
-export default FolderItem
+export default memo(FolderItem)
