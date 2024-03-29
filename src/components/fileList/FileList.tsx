@@ -40,7 +40,7 @@ const FileList = () => {
     }
 
     fetchData()
-  }, [])
+  }, [currentFolderId])
   return loading ? (
     <Loader />
   ) : fileList.length > 0 ? (
