@@ -9,6 +9,8 @@ import {
 import { SafeAreaView } from "react-native"
 import { PATHS } from "@/src/constants/Paths"
 import FileList from "@/src/components/fileList/FileList"
+import { useSession } from "@/src/context/useSession"
+import { useLoader } from "@/src/context/useLoader"
 
 const BrowseScreen = () => {
   const { browse, previousFolderId } = useLocalSearchParams()
@@ -28,6 +30,7 @@ const BrowseScreen = () => {
       },
     })
   }
+  console.log(path)
 
   return (
     <SafeAreaView className="flex-1">
@@ -38,7 +41,7 @@ const BrowseScreen = () => {
             backgroundColor: "orange",
           },
           headerLeft: () =>
-            path !== PATHS.browseTabInitialRoute ? (
+            !path.endsWith("Home") ? (
               <Feather
                 style={{ paddingLeft: 16 }}
                 name="arrow-left"

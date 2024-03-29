@@ -3,6 +3,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { Note } from "@/src/types/Note"
 import { useRouter } from "expo-router"
 import { memo } from "react"
+import { useLoader } from "@/src/context/useLoader"
 type NoteItemProps = {
   noteDetails: Note
 }

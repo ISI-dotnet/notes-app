@@ -19,6 +19,10 @@ export default function AppLayout() {
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="note/[id]"
+        options={{ animation: "slide_from_right" }}
+      />
     </Stack>
   )
 }
