@@ -12,7 +12,7 @@ const NoteItem = ({ noteDetails }: NoteItemProps) => {
 
   const handleNoteItemPress = () => {
     const id = noteDetails.id.toString()
-    router.navigate(`note/${id}`)
+    router.navigate(`/note/${id}`)
   }
   return (
     <TouchableOpacity

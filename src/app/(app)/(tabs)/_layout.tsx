@@ -24,7 +24,6 @@ const TabLayout = () => {
       <Tabs.Screen
         name="index"
         options={{
-          headerShown: false,
           title: "Home",
           tabBarIcon: ({ color }) => (
             <Feather size={24} name="home" color={color} />

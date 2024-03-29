@@ -11,13 +11,14 @@ import FolderItem from "./FolderItem"
 import EmptyFolder from "./EmptyFolder"
 import { useLoader } from "@/src/context/useLoader"
 import Loader from "../Loader"
+import { useSession } from "@/src/context/useSession"
 
 const FileList = () => {
   const { currentFolderId } = useLocalSearchParams()
   const { loading, setIsLoading } = useLoader()
 
   const [fileList, setFileList] = useState<(Note | NoteFolder)[]>([])
-  const user = auth.currentUser
+  const { session } = useSession()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,8 +26,8 @@ const FileList = () => {
         setIsLoading(true)
         // Fetch notes and folders concurrently
         const [notesArr, foldersArr] = await Promise.all([
-          getNotes(user!.uid, currentFolderId as string),
-          getFolders(user!.uid, currentFolderId as string),
+          getNotes(session!, currentFolderId as string),
+          getFolders(session!, currentFolderId as string),
         ])
 
         // Update fileList state after both promises have resolved

@@ -1,21 +1,15 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome"
-
-import { useFonts } from "expo-font"
-import { Stack } from "expo-router"
-import * as SplashScreen from "expo-splash-screen"
-import { useEffect } from "react"
-import { ThemeProvider } from "@react-navigation/native"
+import { Slot, SplashScreen } from "expo-router"
+import { SessionProvider } from "../context/AuthContext"
 import { LoaderProvider } from "../context/LoaderContext"
+import { ThemeProvider } from "@react-navigation/native"
+import { useEffect } from "react"
+import { useFonts } from "expo-font"
+import FontAwesome from "@expo/vector-icons/FontAwesome"
 
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from "expo-router"
-
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: "(tabs)",
-}
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync()
@@ -41,10 +35,10 @@ export default function RootLayout() {
     return null
   }
 
-  return <RootLayoutNav />
+  return <Root />
 }
 
-const MyTheme = {
+export const MyTheme = {
   dark: false,
   colors: {
     primary: "rgb(255, 45, 85)",
@@ -56,15 +50,14 @@ const MyTheme = {
   },
 }
 
-function RootLayoutNav() {
+function Root() {
   return (
-    <ThemeProvider value={MyTheme}>
+    <SessionProvider>
       <LoaderProvider>
-        <Stack>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack>
+        <ThemeProvider value={MyTheme}>
+          <Slot />
+        </ThemeProvider>
       </LoaderProvider>
-    </ThemeProvider>
+    </SessionProvider>
   )
 }

@@ -1,8 +1,8 @@
 import { useContext } from "react"
-import { Context } from "./LoaderContext"
+import { LoaderContext } from "./LoaderContext"
 
 export const useLoader = () => {
-  const value = useContext(Context)
+  const value = useContext(LoaderContext)
   if (!value) {
     throw new Error("useLoader must be used within a LoaderProvider")
   }

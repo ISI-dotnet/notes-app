@@ -1,47 +1,32 @@
-import React, { useState, useEffect } from "react"
 import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  StyleSheet,
   ScrollView,
+  TextInput,
+  View,
+  StyleSheet,
+  Text,
+  Button,
 } from "react-native"
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-} from "@firebase/auth"
-import { app } from "@/firebaseConfig"
-import { router } from "expo-router"
+import { useSession } from "../context/useSession"
+import { useState } from "react"
+import { useRouter } from "expo-router"
 
-const App = () => {
+const SignInPage = () => {
+  const { signIn, signUp } = useSession()
+  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [user, setUser] = useState(null) // Track user authentication state
   const [isLogin, setIsLogin] = useState(true)
-
-  const auth = getAuth(app)
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user)
-    })
-
-    return () => unsubscribe()
-  }, [auth, user])
 
   const handleAuthentication = async () => {
     try {
       if (isLogin) {
         // Sign in
-        await signInWithEmailAndPassword(auth, email, password)
-        router.replace("/(tabs)/")
+        await signIn(email, password)
+        router.navigate("/(tabs)/")
       } else {
         // Sign up
-        await createUserWithEmailAndPassword(auth, email, password)
-        console.log("User created successfully!")
-        // router.push("/browse")
+        await signUp(email, password)
+        setIsLogin(true)
       }
     } catch (error) {
       console.error("Authentication error:", error.message)
@@ -85,7 +70,7 @@ const App = () => {
   )
 }
 
-export default App
+export default SignInPage
 
 const styles = StyleSheet.create({
   container: {

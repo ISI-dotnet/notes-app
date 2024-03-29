@@ -5,7 +5,7 @@ type LoaderContext = {
   setIsLoading: (loading: boolean) => void
 }
 
-export const Context = createContext<LoaderContext | null>(null)
+export const LoaderContext = createContext<LoaderContext | null>(null)
 
 type LoaderProviderProps = {
   children: ReactNode
@@ -19,8 +19,8 @@ export const LoaderProvider = ({ children }: LoaderProviderProps) => {
   }
 
   return (
-    <Context.Provider value={{ loading, setIsLoading }}>
+    <LoaderContext.Provider value={{ loading, setIsLoading }}>
       {children}
-    </Context.Provider>
+    </LoaderContext.Provider>
   )
 }

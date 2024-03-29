@@ -17,12 +17,14 @@ import { auth } from "@/firebaseConfig"
 import { createNote, getNoteById, updateNote } from "@/src/api/note/note"
 import { useLoader } from "@/src/context/useLoader"
 import Loader from "@/src/components/Loader"
+import { useSession } from "@/src/context/useSession"
 
 const NotePage = () => {
   const { id }: { id: string } = useLocalSearchParams()
   const { loading, setIsLoading } = useLoader()
+  const { session } = useSession()
   const [noteDetails, setNoteDetails] = useState<Omit<Note, "id"> | Note>({
-    userId: auth.currentUser!.uid,
+    userId: session!,
     title: "",
     description: "",
     parentFolderName: "Home",
