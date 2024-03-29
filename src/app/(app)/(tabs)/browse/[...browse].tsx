@@ -27,7 +27,6 @@ const BrowseScreen = () => {
       },
     })
   }
-  console.log(path)
 
   return (
     <SafeAreaView className="flex-1">
