@@ -13,16 +13,18 @@ import { RichEditor } from "react-native-pell-rich-editor"
 import Toolbar from "@/src/components/note/Toolbar"
 import RichTextEditor from "@/src/components/note/RichTextEditor"
 import { Note } from "@/src/types/Note"
-import { auth } from "@/firebaseConfig"
 import { createNote, getNoteById, updateNote } from "@/src/api/note/note"
 import { useLoader } from "@/src/context/useLoader"
 import Loader from "@/src/components/Loader"
 import { useSession } from "@/src/context/useSession"
+import { useNavigation } from "expo-router"
 
 const NotePage = () => {
   const { id }: { id: string } = useLocalSearchParams()
   const { loading, setIsLoading } = useLoader()
   const { session } = useSession()
+  const navigation = useNavigation()
+
   const [noteDetails, setNoteDetails] = useState<Omit<Note, "id"> | Note>({
     userId: session!,
     title: "",
@@ -57,13 +59,14 @@ const NotePage = () => {
         setIsLoading(true)
         const note = await getNoteById(id)
         setNoteDetails(note)
-        setTimeout(() => {}, 500)
         setIsLoading(false)
       }
     }
-
-    getNoteDetails()
-  }, [])
+    const unsubscribe = navigation.addListener("transitionEnd" as any, () => {
+      getNoteDetails()
+    })
+    return unsubscribe
+  }, [navigation])
 
   // effect used for showing and hiding note styling toolbar based on keyboard visibility on screen
   useEffect(() => {
@@ -115,7 +118,7 @@ const NotePage = () => {
           ),
         }}
       />
-      {loading ? (
+      {loading || (id !== "0" && noteDetails.title === "") ? (
         <Loader />
       ) : (
         <ScrollView

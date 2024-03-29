@@ -1,4 +1,3 @@
-import { auth } from "@/firebaseConfig"
 import { getFolders } from "@/src/api/note/folder"
 import { getNotes } from "@/src/api/note/note"
 import { Note } from "@/src/types/Note"

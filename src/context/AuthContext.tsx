@@ -1,8 +1,6 @@
 import {
-  getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  onAuthStateChanged,
   signOut as firebaseSignOut,
 } from "@firebase/auth"
 import { auth } from "@/firebaseConfig"
@@ -33,7 +31,11 @@ export function SessionProvider(props: PropsWithChildren) {
   const signIn = async (email: string, password: string) => {
     try {
       await signInWithEmailAndPassword(auth, email, password)
-      setSession(auth.currentUser ? auth.currentUser.uid : null)
+      if (auth.currentUser) {
+        setSession(auth.currentUser.uid)
+      } else {
+        throw new Error("Couldn't get user info, please try again.")
+      }
     } catch (error) {
       console.error("Sign-in error:", error.message)
     }

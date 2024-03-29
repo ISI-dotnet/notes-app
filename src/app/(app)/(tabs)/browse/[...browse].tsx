@@ -7,10 +7,7 @@ import {
   useRouter,
 } from "expo-router"
 import { SafeAreaView } from "react-native"
-import { PATHS } from "@/src/constants/Paths"
 import FileList from "@/src/components/fileList/FileList"
-import { useSession } from "@/src/context/useSession"
-import { useLoader } from "@/src/context/useLoader"
 
 const BrowseScreen = () => {
   const { browse, previousFolderId } = useLocalSearchParams()
@@ -41,7 +38,7 @@ const BrowseScreen = () => {
             backgroundColor: "orange",
           },
           headerLeft: () =>
-            !path.endsWith("Home") ? (
+            previousFolderId !== "" ? (
               <Feather
                 style={{ paddingLeft: 16 }}
                 name="arrow-left"
