@@ -1,58 +1,41 @@
-import React, { useState, useEffect } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  StyleSheet,
   ScrollView,
-} from "react-native";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut,
-} from "@firebase/auth";
-import { app } from "@/firebaseConfig";
-import { router } from "expo-router";
+  TextInput,
+  View,
+  StyleSheet,
+  Text,
+  Button,
+} from "react-native"
+import { useSession } from "../context/useSession"
+import { useState } from "react"
+import { useRouter } from "expo-router"
 
-const App = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null); // Track user authentication state
-  const [isLogin, setIsLogin] = useState(true);
-
-  const auth = getAuth(app);
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-    });
-
-    return () => unsubscribe();
-  }, [auth, user]);
+const SignInPage = () => {
+  const { signIn, signUp } = useSession()
+  const router = useRouter()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [isLogin, setIsLogin] = useState(true)
 
   const handleAuthentication = async () => {
     try {
       if (isLogin) {
         // Sign in
-        await signInWithEmailAndPassword(auth, email, password);
-        router.replace("/(tabs)/");
+        await signIn(email, password)
+        router.navigate("/(tabs)/")
       } else {
         // Sign up
-        await createUserWithEmailAndPassword(auth, email, password);
-        console.log("User created successfully!");
-        // router.push("/browse")
+        await signUp(email, password)
+        setIsLogin(true)
       }
     } catch (error) {
-      console.error("Authentication error:", error.message);
+      console.error("Authentication error:", error.message)
     }
-  };
+  }
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.authContainer}>
         <Text style={styles.title}>{isLogin ? "Sign In" : "Sign Up"}</Text>
-
         <TextInput
           style={styles.input}
           value={email}
@@ -84,10 +67,10 @@ const App = () => {
         </View>
       </View>
     </ScrollView>
-  );
-};
+  )
+}
 
-export default App;
+export default SignInPage
 
 const styles = StyleSheet.create({
   container: {
@@ -133,4 +116,4 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
-});
+})

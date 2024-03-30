@@ -7,14 +7,16 @@ type RichTextEditorProps = {
   setIsFocused: React.Dispatch<React.SetStateAction<boolean>>
   handleScroll(scrollY: number): void
   handleChange(descriptionText: string): void
+  noteDescription: string
 }
 
 const RichTextEditor = forwardRef<RichEditor, RichTextEditorProps>(
-  ({ setIsFocused, handleScroll, handleChange }, ref) => {
+  ({ setIsFocused, handleScroll, handleChange, noteDescription }, ref) => {
     const { colors } = useTheme()
     return (
       <RichEditor
         showsVerticalScrollIndicator={false}
+        initialContentHTML={noteDescription}
         placeholder="Note"
         style={{ marginHorizontal: 4 }}
         editorStyle={{

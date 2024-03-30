@@ -24,7 +24,6 @@ const TabLayout = () => {
       <Tabs.Screen
         name="index"
         options={{
-          headerShown: false,
           title: "Home",
           tabBarIcon: ({ color }) => (
             <Feather size={24} name="home" color={color} />
@@ -51,8 +50,8 @@ const TabLayout = () => {
         }}
         initialParams={{
           browse: ["Home"],
-          currentFolderId: 0,
-          previousFolderId: 0,
+          currentFolderId: "home",
+          previousFolderId: "",
         }}
       />
       <Tabs.Screen
