@@ -37,16 +37,15 @@ export function SessionProvider(props: PropsWithChildren) {
         throw new Error("Couldn't get user info, please try again.")
       }
     } catch (error) {
-      console.error("Sign-in error:", error.message)
+      throw error
     }
   }
 
   const signUp = async (email: string, password: string) => {
     try {
       await createUserWithEmailAndPassword(auth, email, password)
-      console.log("User created successfully!")
     } catch (error) {
-      console.error("Sign-in error:", error.message)
+      throw error
     }
   }
 
@@ -60,7 +59,7 @@ export function SessionProvider(props: PropsWithChildren) {
         router.replace("/")
       }
     } catch (error) {
-      console.error("Authentication error:", error.message)
+      throw error
     }
   }
 
