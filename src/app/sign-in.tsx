@@ -2,15 +2,12 @@ import {
   ScrollView,
   TextInput,
   View,
-  StyleSheet,
   Text,
-  Button,
   TouchableOpacity,
 } from "react-native"
 import { useSession } from "../context/useSession"
 import { useState } from "react"
 import { useRouter } from "expo-router"
-import Toast from "react-native-toast-message"
 import { showToast } from "../utils/showToast"
 import { auth } from "@/firebaseConfig"
 import { toastFirebaseErrors } from "../utils/toastFirebaseErrors"

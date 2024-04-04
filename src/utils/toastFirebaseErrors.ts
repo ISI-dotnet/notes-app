@@ -1,7 +1,6 @@
 import { showToast } from "./showToast"
 
 export const toastFirebaseErrors = (errorMessage: string) => {
-  console.log(JSON.stringify(errorMessage))
   switch (errorMessage) {
     case "Firebase: Error (auth/invalid-email).":
       showToast("error", "Provided email is not valid", undefined)

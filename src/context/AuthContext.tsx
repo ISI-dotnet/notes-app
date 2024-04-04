@@ -54,7 +54,6 @@ export function SessionProvider(props: PropsWithChildren) {
       if (session) {
         // If user is already authenticated, log out
         await firebaseSignOut(auth)
-        console.log("User logged out successfully!")
         setSession(null)
         router.replace("/")
       }

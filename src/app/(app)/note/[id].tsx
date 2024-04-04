@@ -18,6 +18,9 @@ import { useLoader } from "@/src/context/useLoader"
 import Loader from "@/src/components/Loader"
 import { useSession } from "@/src/context/useSession"
 import { useNavigation } from "expo-router"
+import { toastFirebaseErrors } from "@/src/utils/toastFirebaseErrors"
+import { showToast } from "@/src/utils/showToast"
+import { UNKNOWN_ERROR_MESSAGE } from "@/src/constants/ErrorMessages"
 
 const NotePage = () => {
   const { id }: { id: string } = useLocalSearchParams()
@@ -45,11 +48,23 @@ const NotePage = () => {
       const updatedNote = { id: id, ...noteDetails }
       updateNote(updatedNote)
         .then(() => router.back())
-        .catch((error) => console.log(error))
+        .catch((error) => {
+          if (error.message) {
+            toastFirebaseErrors(error.message)
+          } else {
+            showToast("error", UNKNOWN_ERROR_MESSAGE)
+          }
+        })
     } else {
       createNote(noteDetails)
         .then(() => router.back())
-        .catch((error) => console.log(error))
+        .catch((error) => {
+          if (error.message) {
+            toastFirebaseErrors(error.message)
+          } else {
+            showToast("error", UNKNOWN_ERROR_MESSAGE)
+          }
+        })
     }
   }
 

@@ -24,6 +24,7 @@ const TabLayout = () => {
       <Tabs.Screen
         name="index"
         options={{
+          headerShown: false,
           title: "Home",
           tabBarIcon: ({ color }) => (
             <Feather size={24} name="home" color={color} />
@@ -57,11 +58,13 @@ const TabLayout = () => {
       <Tabs.Screen
         name="user"
         options={{
-          headerShown: false,
           title: "User",
+
           tabBarIcon: ({ color }) => (
             <Feather name="heart" size={24} color={color} />
           ),
+          headerStyle: { backgroundColor: "orange" },
+          headerTitle: "Profile",
         }}
       />
     </Tabs>

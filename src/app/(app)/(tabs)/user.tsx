@@ -1,7 +1,12 @@
 import { auth } from "@/firebaseConfig"
 import { useSession } from "@/src/context/useSession"
-import { Button, Text, StyleSheet } from "react-native"
+import { Text, TouchableOpacity, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
+import { MaterialIcons } from "@expo/vector-icons"
+import { toastFirebaseErrors } from "@/src/utils/toastFirebaseErrors"
+import { showToast } from "@/src/utils/showToast"
+import { UNKNOWN_ERROR_MESSAGE } from "@/src/constants/ErrorMessages"
+import { Stack } from "expo-router"
 
 const UserPage = () => {
   const { signOut } = useSession()
@@ -9,65 +14,35 @@ const UserPage = () => {
   const user = auth.currentUser
 
   const handleLogOut = async () => {
-    try {
-      await signOut()
-    } catch (error) {
-      console.error("Authentication error:", error.message)
-    }
+    await signOut()
+      .then(() =>
+        showToast("success", "You are now logged out!", undefined, 4000)
+      )
+      .catch((error) => {
+        if (error.message) {
+          toastFirebaseErrors(error.message)
+        } else {
+          showToast("error", UNKNOWN_ERROR_MESSAGE)
+        }
+      })
   }
 
   return (
-    <SafeAreaView className="flex-1">
-      <Text style={styles.title}>Welcome</Text>
-      <Text style={styles.emailText}>{user?.email}</Text>
-      <Button title="Logout" onPress={handleLogOut} color="#e74c3c" />
+    <SafeAreaView className="flex-1 px-16">
+      <View className="items-center">
+        <MaterialIcons name="account-circle" size={100} color="grey" />
+      </View>
+      <Text className="mb-10 mt-2 text-center font-semibold text-lg">
+        {user?.email}
+      </Text>
+      <TouchableOpacity
+        onPress={handleLogOut}
+        className="bg-red-500 h-12 rounded-md justify-center items-center shadow-sm shadow-black"
+      >
+        <Text className="text-base text-white uppercase">logout</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   )
 }
 
 export default UserPage
-
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 16,
-    backgroundColor: "#f0f0f0",
-  },
-  authContainer: {
-    width: "80%",
-    maxWidth: 400,
-    backgroundColor: "#fff",
-    padding: 16,
-    borderRadius: 8,
-    elevation: 3,
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 16,
-    textAlign: "center",
-  },
-  input: {
-    height: 40,
-    borderColor: "#ddd",
-    borderWidth: 1,
-    marginBottom: 16,
-    padding: 8,
-    borderRadius: 4,
-  },
-  buttonContainer: {
-    marginBottom: 16,
-  },
-  toggleText: {
-    color: "#3498db",
-    textAlign: "center",
-  },
-  bottomContainer: {
-    marginTop: 20,
-  },
-  emailText: {
-    fontSize: 18,
-    textAlign: "center",
-    marginBottom: 20,
-  },
-})

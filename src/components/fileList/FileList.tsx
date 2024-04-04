@@ -11,6 +11,9 @@ import EmptyFolder from "./EmptyFolder"
 import { useLoader } from "@/src/context/useLoader"
 import Loader from "../Loader"
 import { useSession } from "@/src/context/useSession"
+import { showToast } from "@/src/utils/showToast"
+import { toastFirebaseErrors } from "@/src/utils/toastFirebaseErrors"
+import { UNKNOWN_ERROR_MESSAGE } from "@/src/constants/ErrorMessages"
 
 const FileList = () => {
   const { currentFolderId } = useLocalSearchParams()
@@ -31,8 +34,12 @@ const FileList = () => {
 
         // Update fileList state after both promises have resolved
         setFileList([...foldersArr, ...notesArr])
-      } catch (error) {
-        console.error("Error fetching data:", error)
+      } catch (error: any) {
+        if (error.message) {
+          toastFirebaseErrors(error.message)
+        } else {
+          showToast("error", UNKNOWN_ERROR_MESSAGE)
+        }
       } finally {
         setIsLoading(false)
       }
