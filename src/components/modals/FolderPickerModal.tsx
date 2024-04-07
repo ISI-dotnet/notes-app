@@ -27,7 +27,8 @@ const FolderPickerModal = ({
   )
   const [previousFolders, setPreviousFolders] = useState<string[]>([]) // List of previous folder titles
   const { session } = useSession()
-  const { currentFolderId: initialFolderId } = useLocalSearchParams() // Initial folder ID
+  const { currentFolderId: initialFolderId, browse } = useLocalSearchParams() // Initial folder ID
+  const initialFolderName = browse.at(-1)
 
   useEffect(() => {
     fetchFolders(initialFolderId as string) // Fetch folders using initial folder ID
@@ -42,6 +43,7 @@ const FolderPickerModal = ({
       const fetchedFolders = await getFolders(session!, folderId)
       setFolders(fetchedFolders)
       setCurrentFolderId(folderId)
+      setCurrentFolderTitle(initialFolderName as string)
     } catch (error) {
       console.error("Error fetching folders:", error)
     }
@@ -53,8 +55,11 @@ const FolderPickerModal = ({
       setCurrentFolderTitle(folderTitle)
       const fetchedFolders = await getFolders(session!, folderId) // Fetch contents of selected folder
       setFolders(fetchedFolders)
-      // Add current folder title to the previous folders list
-      setPreviousFolders((prev) => [...prev, currentFolderId || "home"])
+      // Add current folder id to the previous folders list
+      setPreviousFolders((prev) => [
+        ...prev,
+        currentFolderId || (initialFolderId as string),
+      ])
     } catch (error) {
       console.error("Error fetching folders:", error)
     }
@@ -67,12 +72,7 @@ const FolderPickerModal = ({
   }
 
   const handleSelect = () => {
-    if (!currentFolderId && !currentFolderTitle) {
-      setCurrentFolderId("home")
-      setCurrentFolderTitle("Home")
-    }
-
-    onSelectFolder(currentFolderId || "home", currentFolderTitle || "Home")
+    onSelectFolder(currentFolderId as string, currentFolderTitle as string)
     onClose()
   }
 

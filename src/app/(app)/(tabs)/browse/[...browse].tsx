@@ -14,6 +14,8 @@ import {
   Modal,
   View,
   StyleSheet,
+  TouchableOpacity, // Import TouchableOpacity
+  Text, // Import Text
 } from "react-native"
 import FileList from "@/src/components/fileList/FileList"
 import { createFolder } from "@/src/api/note/folder"
@@ -128,11 +130,19 @@ const BrowseScreen = () => {
             value={newFolderTitle}
             onChangeText={setNewFolderTitle}
           />
-          <Button
-            title="Create Folder"
-            onPress={handleCreateNewFolder}
-            color="orange" // Set button color to orange
-          />
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Create Folder"
+              onPress={handleCreateNewFolder}
+              color="orange" // Set button color to orange
+            />
+            <TouchableOpacity
+              onPress={() => setIsNewFolderModalVisible(false)} // Close modal on cancel
+              style={styles.cancelButton}
+            >
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Modal>
     </SafeAreaView>
@@ -160,15 +170,19 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: "#fff",
   },
-  createButton: {
-    backgroundColor: "orange",
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "80%",
+  },
+  cancelButton: {
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 5,
+    backgroundColor: "#ddd",
   },
-  createButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
+  cancelButtonText: {
+    color: "#000",
   },
 })
 
