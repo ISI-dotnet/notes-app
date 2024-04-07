@@ -42,8 +42,11 @@ const NotePage = () => {
   const [isFocused, setIsFocused] = useState(false)
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
 
-  // TODO: handle errors with toast, modal or smth
   const handleSubmit = () => {
+    if (noteDetails.title === "") {
+      showToast("info", "Note can't be saved without a title")
+      return
+    }
     if (id !== "0") {
       const updatedNote = { id: id, ...noteDetails }
       updateNote(updatedNote)
@@ -129,11 +132,12 @@ const NotePage = () => {
               size={24}
               color="black"
               onPress={handleSubmit}
+              style={{ opacity: noteDetails.title === "" ? 0.3 : 1 }}
             />
           ),
         }}
       />
-      {loading || (id !== "0" && noteDetails.title === "") ? (
+      {loading || (id !== "0" && noteDetails.dateCreated === undefined) ? (
         <Loader />
       ) : (
         <ScrollView
