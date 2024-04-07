@@ -25,6 +25,7 @@ const FolderPickerModal = ({
   const [currentFolderTitle, setCurrentFolderTitle] = useState<string | null>(
     null
   )
+  const [previousFolders, setPreviousFolders] = useState<string[]>([]) // List of previous folder titles
   const { session } = useSession()
   const { currentFolderId: initialFolderId } = useLocalSearchParams() // Initial folder ID
 
@@ -40,7 +41,7 @@ const FolderPickerModal = ({
 
       const fetchedFolders = await getFolders(session!, folderId)
       setFolders(fetchedFolders)
-      setCurrentFolderId(folderId) // Set current folder ID
+      setCurrentFolderId(folderId)
     } catch (error) {
       console.error("Error fetching folders:", error)
     }
@@ -52,21 +53,27 @@ const FolderPickerModal = ({
       setCurrentFolderTitle(folderTitle)
       const fetchedFolders = await getFolders(session!, folderId) // Fetch contents of selected folder
       setFolders(fetchedFolders)
+      // Add current folder title to the previous folders list
+      setPreviousFolders((prev) => [...prev, currentFolderId || "home"])
     } catch (error) {
       console.error("Error fetching folders:", error)
     }
   }
 
   const handleBackPress = () => {
-    if (currentFolderId) {
-      fetchFolders(currentFolderId)
-    }
+    console.log(previousFolders)
+    const lastFolder = previousFolders.pop()
+    fetchFolders(lastFolder as string)
   }
+
   const handleSelect = () => {
-    if (currentFolderId && currentFolderTitle) {
-      onSelectFolder(currentFolderId, currentFolderTitle)
-      onClose()
+    if (!currentFolderId && !currentFolderTitle) {
+      setCurrentFolderId("home")
+      setCurrentFolderTitle("Home")
     }
+
+    onSelectFolder(currentFolderId || "home", currentFolderTitle || "Home")
+    onClose()
   }
 
   const renderItem = ({ item }: { item: NoteFolder }) => (
@@ -93,7 +100,13 @@ const FolderPickerModal = ({
       <TouchableOpacity onPress={handleSelect} style={styles.selectButton}>
         <Text style={styles.selectButtonText}>Select</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+      <TouchableOpacity
+        onPress={() => {
+          onClose()
+          setPreviousFolders([])
+        }}
+        style={styles.closeButton}
+      >
         <Text style={styles.closeButtonText}>Close</Text>
       </TouchableOpacity>
     </View>

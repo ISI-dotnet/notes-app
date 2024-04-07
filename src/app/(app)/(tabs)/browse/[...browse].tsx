@@ -23,8 +23,12 @@ import FolderPickerModal from "@/src/components/modals/FolderPickerModal"
 const BrowseScreen = () => {
   const { browse, previousFolderId, currentFolderId } = useLocalSearchParams()
   const { session } = useSession()
-  const [isModalVisible, setIsModalVisible] = useState(false)
+  const [isFolderPickerModalVisible, setIsFolderPickerModalVisible] =
+    useState(false)
+  const [isNewFolderModalVisible, setIsNewFolderModalVisible] = useState(false)
   const [newFolderTitle, setNewFolderTitle] = useState("")
+  const [selectedFolderId, setSelectedFolderId] = useState("")
+  const [selectedFolderTitle, setSelectedFolderTitle] = useState("")
   const path = usePathname()
   const router = useRouter()
   const currentFolderName = browse[browse.length - 1]
@@ -41,28 +45,27 @@ const BrowseScreen = () => {
     })
   }
 
-  const [selectedFolderId, setSelectedFolderId] = useState("")
-  const [selectedFolderTitle, setSelectedFolderTitle] = useState("")
-
   const handleSelectFolder = (folderId: string, folderTitle: string) => {
     setSelectedFolderId(folderId)
     setSelectedFolderTitle(folderTitle)
     console.log("Selected Folder ID:", folderId)
     console.log("Selected Folder Title:", folderTitle)
+    setIsFolderPickerModalVisible(false)
+    setIsNewFolderModalVisible(true)
   }
 
   const handleCreateNewFolder = async () => {
     try {
       await createFolder({
         title: newFolderTitle,
-        parentFolderName: currentFolderName,
-        parentFolderId: currentFolderId.toString(),
+        parentFolderName: selectedFolderTitle,
+        parentFolderId: selectedFolderId,
         userId: session!,
       })
       console.log("New Folder Name:", newFolderTitle)
       console.log("New Folder ID:", currentFolderId)
       setNewFolderTitle("") // Clear input field
-      setIsModalVisible(false) // Close modal after creating folder
+      setIsNewFolderModalVisible(false) // Close modal after creating folder
     } catch (error) {
       console.error("Error creating folder:", error)
       // Handle error appropriately, e.g., show error message to the user
@@ -94,7 +97,7 @@ const BrowseScreen = () => {
                 size={24}
                 color="black"
                 style={{ marginRight: 16 }}
-                onPress={() => setIsModalVisible(true)}
+                onPress={() => setIsFolderPickerModalVisible(true)}
               />
             </View>
           ),
@@ -104,13 +107,33 @@ const BrowseScreen = () => {
       <Modal
         animationType="slide"
         transparent={true}
-        visible={isModalVisible}
-        onRequestClose={() => setIsModalVisible(false)}
+        visible={isFolderPickerModalVisible}
+        onRequestClose={() => setIsFolderPickerModalVisible(false)}
       >
         <FolderPickerModal
           onSelectFolder={handleSelectFolder}
-          onClose={() => setIsModalVisible(false)}
+          onClose={() => setIsFolderPickerModalVisible(false)}
         />
+      </Modal>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isNewFolderModalVisible}
+        onRequestClose={() => setIsNewFolderModalVisible(false)}
+      >
+        <View style={styles.newFolderModalContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter new folder title"
+            value={newFolderTitle}
+            onChangeText={setNewFolderTitle}
+          />
+          <Button
+            title="Create Folder"
+            onPress={handleCreateNewFolder}
+            color="orange" // Set button color to orange
+          />
+        </View>
       </Modal>
     </SafeAreaView>
   )
@@ -120,6 +143,32 @@ const styles = StyleSheet.create({
   headerRightContainer: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  newFolderModalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  input: {
+    width: "80%",
+    height: 40,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    marginBottom: 20,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    backgroundColor: "#fff",
+  },
+  createButton: {
+    backgroundColor: "orange",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 5,
+  },
+  createButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 })
 
