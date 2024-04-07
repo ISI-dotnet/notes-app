@@ -9,6 +9,7 @@ import {
 import { NoteFolder } from "@/src/types/NoteFolder"
 import { getFolders } from "@/src/api/note/folder"
 import { useSession } from "@/src/context/useSession"
+import { useLocalSearchParams } from "expo-router"
 
 type FolderPickerModalProps = {
   onSelectFolder: (folderId: string, folderTitle: string) => void
@@ -25,10 +26,11 @@ const FolderPickerModal = ({
     null
   )
   const { session } = useSession()
+  const { currentFolderId: initialFolderId } = useLocalSearchParams() // Initial folder ID
 
   useEffect(() => {
-    fetchFolders(currentFolderId)
-  }, [currentFolderId])
+    fetchFolders(initialFolderId as string) // Fetch folders using initial folder ID
+  }, [])
 
   const fetchFolders = async (folderId: string | null) => {
     try {
@@ -38,23 +40,28 @@ const FolderPickerModal = ({
 
       const fetchedFolders = await getFolders(session!, folderId)
       setFolders(fetchedFolders)
+      setCurrentFolderId(folderId) // Set current folder ID
     } catch (error) {
       console.error("Error fetching folders:", error)
     }
   }
 
-  const handleFolderPress = (folderId: string, folderTitle: string) => {
-    setCurrentFolderId(folderId)
-    setCurrentFolderTitle(folderTitle)
+  const handleFolderPress = async (folderId: string, folderTitle: string) => {
+    try {
+      setCurrentFolderId(folderId)
+      setCurrentFolderTitle(folderTitle)
+      const fetchedFolders = await getFolders(session!, folderId) // Fetch contents of selected folder
+      setFolders(fetchedFolders)
+    } catch (error) {
+      console.error("Error fetching folders:", error)
+    }
   }
 
   const handleBackPress = () => {
     if (currentFolderId) {
       fetchFolders(currentFolderId)
-      setCurrentFolderId(null)
     }
   }
-
   const handleSelect = () => {
     if (currentFolderId && currentFolderTitle) {
       onSelectFolder(currentFolderId, currentFolderTitle)

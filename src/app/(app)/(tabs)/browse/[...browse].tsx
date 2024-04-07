@@ -18,6 +18,7 @@ import {
 import FileList from "@/src/components/fileList/FileList"
 import { createFolder } from "@/src/api/note/folder"
 import { useSession } from "@/src/context/useSession"
+import FolderPickerModal from "@/src/components/modals/FolderPickerModal"
 
 const BrowseScreen = () => {
   const { browse, previousFolderId, currentFolderId } = useLocalSearchParams()
@@ -40,6 +41,16 @@ const BrowseScreen = () => {
     })
   }
 
+  const [selectedFolderId, setSelectedFolderId] = useState("")
+  const [selectedFolderTitle, setSelectedFolderTitle] = useState("")
+
+  const handleSelectFolder = (folderId: string, folderTitle: string) => {
+    setSelectedFolderId(folderId)
+    setSelectedFolderTitle(folderTitle)
+    console.log("Selected Folder ID:", folderId)
+    console.log("Selected Folder Title:", folderTitle)
+  }
+
   const handleCreateNewFolder = async () => {
     try {
       await createFolder({
@@ -48,7 +59,8 @@ const BrowseScreen = () => {
         parentFolderId: currentFolderId.toString(),
         userId: session!,
       })
-      console.log(currentFolderId)
+      console.log("New Folder Name:", newFolderTitle)
+      console.log("New Folder ID:", currentFolderId)
       setNewFolderTitle("") // Clear input field
       setIsModalVisible(false) // Close modal after creating folder
     } catch (error) {
@@ -84,29 +96,22 @@ const BrowseScreen = () => {
                 style={{ marginRight: 16 }}
                 onPress={() => setIsModalVisible(true)}
               />
-              <Modal
-                animationType="slide"
-                transparent={true}
-                visible={isModalVisible}
-                onRequestClose={() => setIsModalVisible(false)}
-              >
-                <View style={styles.modalContainer}>
-                  <View style={styles.modalContent}>
-                    <TextInput
-                      placeholder="Enter folder name"
-                      value={newFolderTitle}
-                      onChangeText={(text) => setNewFolderTitle(text)}
-                      style={styles.input}
-                    />
-                    <Button title="Create" onPress={handleCreateNewFolder} />
-                  </View>
-                </View>
-              </Modal>
             </View>
           ),
         }}
       />
       <FileList />
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={() => setIsModalVisible(false)}
+      >
+        <FolderPickerModal
+          onSelectFolder={handleSelectFolder}
+          onClose={() => setIsModalVisible(false)}
+        />
+      </Modal>
     </SafeAreaView>
   )
 }
@@ -115,25 +120,6 @@ const styles = StyleSheet.create({
   headerRightContainer: {
     flexDirection: "row",
     alignItems: "center",
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalContent: {
-    backgroundColor: "white",
-    padding: 20,
-    borderRadius: 10,
-    elevation: 5,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 5,
   },
 })
 
