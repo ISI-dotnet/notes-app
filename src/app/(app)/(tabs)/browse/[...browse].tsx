@@ -10,7 +10,7 @@ import { SafeAreaView } from "react-native"
 import FileList from "@/src/components/fileList/FileList"
 
 const BrowseScreen = () => {
-  const { browse, previousFolderId } = useLocalSearchParams()
+  const { browse, previousFolderId, currentFolderId } = useLocalSearchParams()
 
   const path = usePathname()
   const router = useRouter()
@@ -37,7 +37,7 @@ const BrowseScreen = () => {
             backgroundColor: "orange",
           },
           headerLeft: () =>
-            previousFolderId !== "" ? (
+            currentFolderId !== "home" ? (
               <Feather
                 style={{ paddingLeft: 16 }}
                 name="arrow-left"

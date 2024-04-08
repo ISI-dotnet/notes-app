@@ -52,7 +52,7 @@ const TabLayout = () => {
         initialParams={{
           browse: ["Home"],
           currentFolderId: "home",
-          previousFolderId: "",
+          previousFolderId: "home",
         }}
       />
       <Tabs.Screen
