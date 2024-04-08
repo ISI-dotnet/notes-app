@@ -21,6 +21,7 @@ import { useNavigation } from "expo-router"
 import { toastFirebaseErrors } from "@/src/utils/toastFirebaseErrors"
 import { showToast } from "@/src/utils/showToast"
 import { UNKNOWN_ERROR_MESSAGE } from "@/src/constants/ErrorMessages"
+import { convertToPlainText } from "@/src/utils/convertToPlainText"
 
 const NotePage = () => {
   const { id }: { id: string } = useLocalSearchParams()
@@ -32,6 +33,7 @@ const NotePage = () => {
     userId: session!,
     title: "",
     description: "",
+    richTextDescription: "",
     parentFolderName: "Home",
     parentFolderId: "home",
   })
@@ -47,6 +49,9 @@ const NotePage = () => {
       showToast("info", "Note can't be saved without a title")
       return
     }
+    noteDetails.description = convertToPlainText(
+      noteDetails.richTextDescription
+    )
     if (id !== "0") {
       const updatedNote = { id: id, ...noteDetails }
       updateNote(updatedNote)
@@ -165,13 +170,13 @@ const NotePage = () => {
               handleChange={(descriptionText) =>
                 setNoteDetails((oldValue) => ({
                   ...oldValue,
-                  description: descriptionText,
+                  richTextDescription: descriptionText,
                 }))
               }
               ref={richText}
               setIsFocused={setIsFocused}
               handleScroll={handleScroll}
-              noteDescription={noteDetails.description}
+              noteDescription={noteDetails.richTextDescription}
             />
           </KeyboardAvoidingView>
         </ScrollView>
