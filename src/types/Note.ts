@@ -3,6 +3,7 @@ export type Note = {
   userId: string
   title: string
   description: string
+  richTextDescription: string
   parentFolderId: string
   parentFolderName: string
   dateCreated?: Date

@@ -2,13 +2,19 @@ import {
   ScrollView,
   TextInput,
   View,
-  StyleSheet,
   Text,
-  Button,
+  TouchableOpacity,
 } from "react-native"
 import { useSession } from "../context/useSession"
 import { useState } from "react"
 import { useRouter } from "expo-router"
+import { showToast } from "../utils/showToast"
+import { auth } from "@/firebaseConfig"
+import { toastFirebaseErrors } from "../utils/toastFirebaseErrors"
+import { UNKNOWN_ERROR_MESSAGE } from "../constants/ErrorMessages"
+import { COLORS } from "../constants/Colors"
+import { SafeAreaView } from "react-native-safe-area-context"
+import { SimpleLineIcons } from "@expo/vector-icons"
 
 const SignInPage = () => {
   const { signIn, signUp } = useSession()
@@ -17,103 +23,109 @@ const SignInPage = () => {
   const [password, setPassword] = useState("")
   const [isLogin, setIsLogin] = useState(true)
 
+  const handleInputType = () => {
+    setIsLogin(!isLogin)
+    setEmail("")
+    setPassword("")
+  }
+
   const handleAuthentication = async () => {
-    try {
-      if (isLogin) {
-        // Sign in
-        await signIn(email, password)
-        router.navigate("/(tabs)/")
-      } else {
-        // Sign up
-        await signUp(email, password)
-        setIsLogin(true)
-      }
-    } catch (error) {
-      console.error("Authentication error:", error.message)
+    if (isLogin) {
+      // Sign in
+      await signIn(email, password)
+        .then(() => {
+          router.navigate("/(tabs)/")
+          showToast(
+            "success",
+            `Welcome back, ${auth.currentUser?.email} 👋`,
+            undefined,
+            4000
+          )
+        })
+        .catch((error) => {
+          if (error.message) {
+            toastFirebaseErrors(error.message)
+          } else {
+            showToast("error", UNKNOWN_ERROR_MESSAGE)
+          }
+        })
+    } else {
+      // Sign up
+      await signUp(email, password)
+        .then((event) => {
+          showToast(
+            "success",
+            "User created successfully! You can click SIGN IN."
+          )
+          setIsLogin(true)
+        })
+        .catch((error) => {
+          if (error.message) {
+            toastFirebaseErrors(error.message)
+          } else {
+            showToast("error", UNKNOWN_ERROR_MESSAGE)
+          }
+        })
     }
   }
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.authContainer}>
-        <Text style={styles.title}>{isLogin ? "Sign In" : "Sign Up"}</Text>
+    <SafeAreaView className="flex-1 justify-center mb-10">
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: "center",
+          paddingLeft: 64,
+          paddingRight: 64,
+        }}
+      >
+        <View className="items-center mb-10">
+          <SimpleLineIcons name="note" size={80} color={COLORS.darkOrange} />
+        </View>
+
+        <Text className="mb-8 text-2xl text-center font-medium">
+          {isLogin ? "Welcome back." : "Sign Up"}
+        </Text>
         <TextInput
-          style={styles.input}
+          className="h-12 border border-gray-300 mb-4 px-2 rounded-md"
           value={email}
           onChangeText={setEmail}
           placeholder="Email"
           autoCapitalize="none"
         />
         <TextInput
-          style={styles.input}
+          className="h-12 border border-gray-300 mb-4 px-2 rounded-md"
           value={password}
           onChangeText={setPassword}
           placeholder="Password"
           secureTextEntry
         />
-        <View style={styles.buttonContainer}>
-          <Button
-            title={isLogin ? "Sign In" : "Sign Up"}
-            onPress={handleAuthentication}
-            color="#3498db"
-          />
-        </View>
+        <TouchableOpacity
+          className={`mt-4 bg-orange-400 ${
+            email === "" || password === "" ? "opacity-70" : ""
+          } h-12 rounded-md justify-center items-center shadow-sm shadow-black`}
+          disabled={email === "" || password === ""}
+          onPress={handleAuthentication}
+        >
+          <Text className="text-base font- text-white uppercase">
+            {isLogin ? "Sign In" : "Sign Up"}
+          </Text>
+        </TouchableOpacity>
 
-        <View style={styles.bottomContainer}>
-          <Text style={styles.toggleText} onPress={() => setIsLogin(!isLogin)}>
-            {isLogin
-              ? "Need an account? Sign Up"
-              : "Already have an account? Sign In"}
+        <View className="mt-4">
+          <Text className="text-center">
+            {isLogin ? "Need an account? " : "Already have an account? "}
+            <Text
+              className="underline text-orange-500"
+              onPress={handleInputType}
+            >
+              {isLogin ? "Sign Up" : "Sign In"}
+            </Text>
           </Text>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   )
 }
 
 export default SignInPage
-
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 16,
-    backgroundColor: "#f0f0f0",
-  },
-  authContainer: {
-    width: "80%",
-    maxWidth: 400,
-    backgroundColor: "#fff",
-    padding: 16,
-    borderRadius: 8,
-    elevation: 3,
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 16,
-    textAlign: "center",
-  },
-  input: {
-    height: 40,
-    borderColor: "#ddd",
-    borderWidth: 1,
-    marginBottom: 16,
-    padding: 8,
-    borderRadius: 4,
-  },
-  buttonContainer: {
-    marginBottom: 16,
-  },
-  toggleText: {
-    color: "#3498db",
-    textAlign: "center",
-  },
-  bottomContainer: {
-    marginTop: 20,
-  },
-  emailText: {
-    fontSize: 18,
-    textAlign: "center",
-    marginBottom: 20,
-  },
-})
