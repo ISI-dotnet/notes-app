@@ -10,6 +10,7 @@ import {
   getDoc,
   doc,
   setDoc,
+  onSnapshot,
 } from "firebase/firestore"
 
 export const createNote = async (
@@ -36,7 +37,10 @@ export const updateNote = async (noteDetails: Note) => {
     })
 }
 
-export const getNotes = async (userId: string, parentFolderId: string) => {
+export const getNotesByFolderId = async (
+  userId: string,
+  parentFolderId: string
+) => {
   const notesRef = collection(db, "notes")
   const q = query(
     notesRef,
@@ -70,4 +74,46 @@ export const getNoteById = async (noteId: string) => {
     .catch((error) => {
       throw error
     })
+}
+
+export const subscribeToNotesByFolderId = (
+  userId: string,
+  parentFolderId: string,
+  existingNotes: Note[],
+  callback: (notes: Note[]) => void
+) => {
+  const notesRef = collection(db, "notes")
+  const q = query(
+    notesRef,
+    where("userId", "==", userId),
+    where("parentFolderId", "==", parentFolderId)
+  )
+
+  return onSnapshot(q, (snapshot) => {
+    snapshot.docChanges().forEach((change) => {
+      const note = { id: change.doc.id, ...change.doc.data() } as Note
+      if (change.type === "added") {
+        const existingNoteIndex = existingNotes.findIndex(
+          (n) => n.id === note.id
+        )
+        if (existingNoteIndex === -1) {
+          // If not found, push the note to modifiedNotes array
+          existingNotes.push(note)
+        }
+      } else if (change.type === "modified") {
+        // Find the index of the modified note in modifiedNotes array
+        const index = existingNotes.findIndex((n) => n.id === note.id)
+        // If found, replace the existing note with the modified one
+
+        if (index !== -1) {
+          existingNotes[index] = note
+        }
+      } else if (change.type === "removed") {
+        // Filter out the removed note from the modifiedNotes array
+        existingNotes = existingNotes.filter((n) => n.id !== note.id)
+      }
+    })
+
+    callback(existingNotes)
+  })
 }
