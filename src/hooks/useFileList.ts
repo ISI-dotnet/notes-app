@@ -23,23 +23,25 @@ const useFileList = (currentFolderId: string) => {
   const { setIsLoading } = useLoader()
 
   useEffect(() => {
+    let initialNotes: Note[] = []
+    let initialFolders: NoteFolder[] = []
     const fetchData = async () => {
       setIsLoading(true)
 
-      const [initialNotes, initialFolders] = await Promise.all([
+      const [notes, folders] = await Promise.all([
         getNotesByFolderId(session!, currentFolderId),
         getFoldersByFolderId(session!, currentFolderId),
       ])
 
-      setFoldersList(initialFolders)
-      setNotesList(initialNotes)
+      initialNotes = notes
+      initialFolders = folders
     }
 
     fetchData()
     const unsubscribeNotes = subscribeToNotesByFolderId(
       session!,
       currentFolderId,
-      notesList,
+      initialNotes,
       (modifiedNotes: Note[]) => {
         setNotesList(modifiedNotes)
       }
@@ -48,13 +50,14 @@ const useFileList = (currentFolderId: string) => {
     const unsubscribeFolders = subscribeToFoldersByFolderId(
       session!,
       currentFolderId,
-      foldersList,
+      initialFolders,
       (modifiedFolders: NoteFolder[]) => setFoldersList(modifiedFolders)
     )
 
     setIsLoading(false)
 
     return () => {
+      console.log("called")
       unsubscribeNotes()
 
       unsubscribeFolders()
