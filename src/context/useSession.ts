@@ -1,5 +1,6 @@
-import { useContext } from "react"
+import { useContext, useEffect, useState } from "react"
 import { AuthContext } from "./AuthContext"
+
 export const useSession = () => {
   const value = useContext(AuthContext)
   if (process.env.NODE_ENV !== "production") {
@@ -8,5 +9,5 @@ export const useSession = () => {
     }
   }
 
-  return value
+  return { ...value }
 }

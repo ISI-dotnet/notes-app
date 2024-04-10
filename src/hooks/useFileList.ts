@@ -23,51 +23,42 @@ const useFileList = (currentFolderId: string) => {
   const { setIsLoading } = useLoader()
 
   useEffect(() => {
-    const fetchDataAndSubscribe = async () => {
-      try {
-        setIsLoading(true)
+    const fetchData = async () => {
+      setIsLoading(true)
 
-        const [initialNotes, initialFolders] = await Promise.all([
-          getNotesByFolderId(session!, currentFolderId),
-          getFoldersByFolderId(session!, currentFolderId),
-        ])
+      const [initialNotes, initialFolders] = await Promise.all([
+        getNotesByFolderId(session!, currentFolderId),
+        getFoldersByFolderId(session!, currentFolderId),
+      ])
 
-        setFoldersList(initialFolders)
-        setNotesList(initialNotes)
-
-        const unsubscribeNotes = subscribeToNotesByFolderId(
-          session!,
-          currentFolderId,
-          initialNotes,
-          (modifiedNotes: Note[]) => {
-            setNotesList(modifiedNotes)
-          }
-        )
-
-        const unsubscribeFolders = subscribeToFoldersByFolderId(
-          session!,
-          currentFolderId,
-          initialFolders,
-          (modifiedFolders: NoteFolder[]) => setFoldersList(modifiedFolders)
-        )
-
-        setIsLoading(false)
-
-        return () => {
-          unsubscribeNotes()
-          unsubscribeFolders()
-        }
-      } catch (error: any) {
-        if (error.message) {
-          toastFirebaseErrors(error.message)
-        } else {
-          showToast("error", UNKNOWN_ERROR_MESSAGE)
-        }
-        setIsLoading(false)
-      }
+      setFoldersList(initialFolders)
+      setNotesList(initialNotes)
     }
 
-    fetchDataAndSubscribe()
+    fetchData()
+    const unsubscribeNotes = subscribeToNotesByFolderId(
+      session!,
+      currentFolderId,
+      notesList,
+      (modifiedNotes: Note[]) => {
+        setNotesList(modifiedNotes)
+      }
+    )
+
+    const unsubscribeFolders = subscribeToFoldersByFolderId(
+      session!,
+      currentFolderId,
+      foldersList,
+      (modifiedFolders: NoteFolder[]) => setFoldersList(modifiedFolders)
+    )
+
+    setIsLoading(false)
+
+    return () => {
+      unsubscribeNotes()
+
+      unsubscribeFolders()
+    }
   }, [currentFolderId, session])
 
   return { notesList, foldersList }
