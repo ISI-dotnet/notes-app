@@ -11,6 +11,8 @@ import {
   doc,
   setDoc,
   onSnapshot,
+  orderBy,
+  limit,
 } from "firebase/firestore"
 
 export const createNote = async (
@@ -115,5 +117,28 @@ export const subscribeToNotesByFolderId = (
     })
 
     callback(existingNotes)
+  })
+}
+
+export const subscribeToRecentNotes = (
+  userId: string,
+  callback: (notes: Note[]) => void
+) => {
+  const notesRef = collection(db, "notes")
+  const q = query(
+    notesRef,
+    where("userId", "==", userId),
+    orderBy("dateModified", "desc"),
+    limit(5)
+  )
+
+  return onSnapshot(q, (snapshot) => {
+    const recentNotes: Note[] = []
+    snapshot.forEach((doc) => {
+      const note = { id: doc.id, ...doc.data() } as Note
+      recentNotes.push(note)
+    })
+
+    callback(recentNotes)
   })
 }
