@@ -14,23 +14,16 @@ import {
   Modal,
   View,
   StyleSheet,
-  TouchableOpacity, // Import TouchableOpacity
-  Text, // Import Text
 } from "react-native"
 import FileList from "@/src/components/fileList/FileList"
 import { createFolder } from "@/src/api/note/folder"
 import { useSession } from "@/src/context/useSession"
-import FolderPickerModal from "@/src/components/modals/FolderPickerModal"
 
 const BrowseScreen = () => {
   const { browse, previousFolderId, currentFolderId } = useLocalSearchParams()
   const { session } = useSession()
-  const [isFolderPickerModalVisible, setIsFolderPickerModalVisible] =
-    useState(false)
   const [isNewFolderModalVisible, setIsNewFolderModalVisible] = useState(false)
   const [newFolderTitle, setNewFolderTitle] = useState("")
-  const [selectedFolderId, setSelectedFolderId] = useState("")
-  const [selectedFolderTitle, setSelectedFolderTitle] = useState("")
   const path = usePathname()
   const router = useRouter()
   const currentFolderName = browse[browse.length - 1]
@@ -47,30 +40,18 @@ const BrowseScreen = () => {
     })
   }
 
-  const handleSelectFolder = (folderId: string, folderTitle: string) => {
-    setSelectedFolderId(folderId)
-    setSelectedFolderTitle(folderTitle)
-    console.log("Selected Folder ID:", folderId)
-    console.log("Selected Folder Title:", folderTitle)
-    setIsFolderPickerModalVisible(false)
-    setIsNewFolderModalVisible(true)
-  }
-
   const handleCreateNewFolder = async () => {
     try {
       await createFolder({
         title: newFolderTitle,
-        parentFolderName: selectedFolderTitle,
-        parentFolderId: selectedFolderId,
+        parentFolderName: currentFolderName,
+        parentFolderId: currentFolderId.toString(),
         userId: session!,
       })
-      console.log("New Folder Name:", newFolderTitle)
-      console.log("New Folder ID:", currentFolderId)
-      setNewFolderTitle("") // Clear input field
-      setIsNewFolderModalVisible(false) // Close modal after creating folder
+      setNewFolderTitle("")
+      setIsNewFolderModalVisible(false)
     } catch (error) {
-      console.error("Error creating folder:", error)
-      // Handle error appropriately, e.g., show error message to the user
+      throw new Error("Error creating folder")
     }
   }
 
@@ -99,24 +80,13 @@ const BrowseScreen = () => {
                 size={24}
                 color="black"
                 style={{ marginRight: 16 }}
-                onPress={() => setIsFolderPickerModalVisible(true)}
+                onPress={() => setIsNewFolderModalVisible(true)}
               />
             </View>
           ),
         }}
       />
       <FileList />
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isFolderPickerModalVisible}
-        onRequestClose={() => setIsFolderPickerModalVisible(false)}
-      >
-        <FolderPickerModal
-          onSelectFolder={handleSelectFolder}
-          onClose={() => setIsFolderPickerModalVisible(false)}
-        />
-      </Modal>
       <Modal
         animationType="slide"
         transparent={true}
@@ -136,12 +106,11 @@ const BrowseScreen = () => {
               onPress={handleCreateNewFolder}
               color="orange" // Set button color to orange
             />
-            <TouchableOpacity
-              onPress={() => setIsNewFolderModalVisible(false)} // Close modal on cancel
-              style={styles.cancelButton}
-            >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
+            <Button
+              title="Cancel"
+              onPress={() => setIsNewFolderModalVisible(false)}
+              color="gray" // Set button color to gray
+            />
           </View>
         </View>
       </Modal>
@@ -174,15 +143,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     width: "80%",
-  },
-  cancelButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 5,
-    backgroundColor: "#ddd",
-  },
-  cancelButtonText: {
-    color: "#000",
   },
 })
 

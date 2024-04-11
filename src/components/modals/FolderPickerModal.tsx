@@ -9,7 +9,6 @@ import {
 import { NoteFolder } from "@/src/types/NoteFolder"
 import { getFolders } from "@/src/api/note/folder"
 import { useSession } from "@/src/context/useSession"
-import { useLocalSearchParams } from "expo-router"
 
 type FolderPickerModalProps = {
   onSelectFolder: (folderId: string, folderTitle: string) => void
@@ -21,29 +20,22 @@ const FolderPickerModal = ({
   onClose,
 }: FolderPickerModalProps) => {
   const [folders, setFolders] = useState<NoteFolder[]>([])
-  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null)
-  const [currentFolderTitle, setCurrentFolderTitle] = useState<string | null>(
-    null
+  const [currentFolderId, setCurrentFolderId] = useState<string>("home") // Hardcoded to 'home'
+  const [currentFolderTitle, setCurrentFolderTitle] = useState<string>("Home") // Hardcoded to 'Home'
+  const [previousFoldersId, setPreviousFoldersId] = useState<string[]>([])
+  const [previousFoldersTitles, setPreviousFoldersTitle] = useState<string[]>(
+    []
   )
-  const [previousFolders, setPreviousFolders] = useState<string[]>([]) // List of previous folder titles
   const { session } = useSession()
-  const { currentFolderId: initialFolderId, browse } = useLocalSearchParams() // Initial folder ID
-  const initialFolderName = browse.at(-1)
 
   useEffect(() => {
-    fetchFolders(initialFolderId as string) // Fetch folders using initial folder ID
+    fetchFolders(currentFolderId)
   }, [])
 
-  const fetchFolders = async (folderId: string | null) => {
+  const fetchFolders = async (folderId: string) => {
     try {
-      if (!folderId) {
-        return
-      }
-
       const fetchedFolders = await getFolders(session!, folderId)
       setFolders(fetchedFolders)
-      setCurrentFolderId(folderId)
-      setCurrentFolderTitle(initialFolderName as string)
     } catch (error) {
       console.error("Error fetching folders:", error)
     }
@@ -51,28 +43,27 @@ const FolderPickerModal = ({
 
   const handleFolderPress = async (folderId: string, folderTitle: string) => {
     try {
+      setPreviousFoldersId((prev) => [...prev, currentFolderId])
+      setPreviousFoldersTitle((prev) => [...prev, currentFolderTitle])
       setCurrentFolderId(folderId)
       setCurrentFolderTitle(folderTitle)
-      const fetchedFolders = await getFolders(session!, folderId) // Fetch contents of selected folder
+      const fetchedFolders = await getFolders(session!, folderId)
       setFolders(fetchedFolders)
-      // Add current folder id to the previous folders list
-      setPreviousFolders((prev) => [
-        ...prev,
-        currentFolderId || (initialFolderId as string),
-      ])
     } catch (error) {
       console.error("Error fetching folders:", error)
     }
   }
 
   const handleBackPress = () => {
-    console.log(previousFolders)
-    const lastFolder = previousFolders.pop()
-    fetchFolders(lastFolder as string)
+    const lastFolderId = previousFoldersId.pop()
+    const lastFolderTitle = previousFoldersTitles.pop()
+    fetchFolders(lastFolderId || "home")
+    setCurrentFolderId(lastFolderId || "home")
+    setCurrentFolderTitle(lastFolderTitle || "Home")
   }
 
   const handleSelect = () => {
-    onSelectFolder(currentFolderId as string, currentFolderTitle as string)
+    onSelectFolder(currentFolderId, currentFolderTitle)
     onClose()
   }
 
@@ -87,7 +78,7 @@ const FolderPickerModal = ({
 
   return (
     <View style={styles.container}>
-      {currentFolderId && (
+      {currentFolderId !== "home" && (
         <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
           <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
@@ -103,7 +94,8 @@ const FolderPickerModal = ({
       <TouchableOpacity
         onPress={() => {
           onClose()
-          setPreviousFolders([])
+          setPreviousFoldersId([])
+          setPreviousFoldersTitle([])
         }}
         style={styles.closeButton}
       >

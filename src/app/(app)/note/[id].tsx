@@ -8,6 +8,9 @@ import {
   ScrollView,
   TextInput,
   View,
+  Modal,
+  TouchableOpacity,
+  Text,
 } from "react-native"
 import { RichEditor } from "react-native-pell-rich-editor"
 import Toolbar from "@/src/components/note/Toolbar"
@@ -18,12 +21,15 @@ import { useLoader } from "@/src/context/useLoader"
 import Loader from "@/src/components/Loader"
 import { useSession } from "@/src/context/useSession"
 import { useNavigation } from "expo-router"
+import FolderPickerModal from "@/src/components/modals/FolderPickerModal"
 
 const NotePage = () => {
   const { id }: { id: string } = useLocalSearchParams()
   const { loading, setIsLoading } = useLoader()
   const { session } = useSession()
   const navigation = useNavigation()
+  const [isFolderPickerModalVisible, setIsFolderPickerModalVisible] =
+    useState(false)
 
   const [noteDetails, setNoteDetails] = useState<Omit<Note, "id"> | Note>({
     userId: session!,
@@ -35,6 +41,9 @@ const NotePage = () => {
 
   const richText = useRef<RichEditor | null>(null)
   const scrollRef = useRef<ScrollView | null>(null)
+
+  const [selectedFolderId, setSelectedFolderId] = useState("")
+  const [selectedFolderTitle, setSelectedFolderTitle] = useState("Home")
 
   const [isFocused, setIsFocused] = useState(false)
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
@@ -51,6 +60,19 @@ const NotePage = () => {
         .then(() => router.back())
         .catch((error) => console.log(error))
     }
+  }
+
+  const handleSelectFolder = (folderId: string, folderTitle: string) => {
+    setSelectedFolderId(folderId)
+    setSelectedFolderTitle(folderTitle)
+    setIsFolderPickerModalVisible(false)
+    // Update note details with selected folder
+    setNoteDetails((oldValue) => ({
+      ...oldValue,
+      parentFolderName: folderTitle,
+      parentFolderId: folderId,
+    }))
+    console.log("New folder title" + folderTitle)
   }
 
   useEffect(() => {
@@ -104,7 +126,7 @@ const NotePage = () => {
     <View className="flex-1">
       <Stack.Screen
         options={{
-          title: "",
+          title: selectedFolderTitle,
           headerStyle: {
             backgroundColor: "orange",
           },
@@ -115,6 +137,16 @@ const NotePage = () => {
               color="black"
               onPress={handleSubmit}
             />
+          ),
+          headerTitle: () => (
+            <TouchableOpacity
+              onPress={() => setIsFolderPickerModalVisible(true)}
+              style={{ alignItems: "center", marginLeft: 50 }}
+            >
+              <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+                Folder: {selectedFolderTitle}
+              </Text>
+            </TouchableOpacity>
           ),
         }}
       />
@@ -160,8 +192,20 @@ const NotePage = () => {
 
       {/* Toolbar is only visible on note description and when the keyboard is open */}
       {isFocused && isKeyboardVisible && <Toolbar editor={richText} />}
+
+      {/* FolderPickerModal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isFolderPickerModalVisible}
+        onRequestClose={() => setIsFolderPickerModalVisible(false)}
+      >
+        <FolderPickerModal
+          onSelectFolder={handleSelectFolder}
+          onClose={() => setIsFolderPickerModalVisible(false)}
+        />
+      </Modal>
     </View>
   )
 }
-
 export default NotePage
