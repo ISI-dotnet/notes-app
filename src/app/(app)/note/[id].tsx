@@ -127,6 +127,7 @@ const NotePage = () => {
       <Stack.Screen
         options={{
           title: selectedFolderTitle,
+          headerTitleAlign: "center",
           headerStyle: {
             backgroundColor: "orange",
           },
@@ -141,10 +142,11 @@ const NotePage = () => {
           headerTitle: () => (
             <TouchableOpacity
               onPress={() => setIsFolderPickerModalVisible(true)}
-              style={{ alignItems: "center", marginLeft: 50 }}
+              style={{ alignItems: "center" }}
             >
               <Text style={{ fontWeight: "bold", fontSize: 20 }}>
                 Folder: {selectedFolderTitle}
+                <AntDesign name="down" size={15} color="black" />
               </Text>
             </TouchableOpacity>
           ),

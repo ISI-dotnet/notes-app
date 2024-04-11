@@ -6,6 +6,7 @@ import {
   FlatList,
   StyleSheet,
 } from "react-native"
+import { AntDesign } from "@expo/vector-icons"
 import { NoteFolder } from "@/src/types/NoteFolder"
 import { getFolders } from "@/src/api/note/folder"
 import { useSession } from "@/src/context/useSession"
@@ -20,12 +21,13 @@ const FolderPickerModal = ({
   onClose,
 }: FolderPickerModalProps) => {
   const [folders, setFolders] = useState<NoteFolder[]>([])
-  const [currentFolderId, setCurrentFolderId] = useState<string>("home") // Hardcoded to 'home'
-  const [currentFolderTitle, setCurrentFolderTitle] = useState<string>("Home") // Hardcoded to 'Home'
+  const [currentFolderId, setCurrentFolderId] = useState<string>("home")
+  const [currentFolderTitle, setCurrentFolderTitle] = useState<string>("Home")
   const [previousFoldersId, setPreviousFoldersId] = useState<string[]>([])
-  const [previousFoldersTitles, setPreviousFoldersTitle] = useState<string[]>(
+  const [previousFoldersTitles, setPreviousFoldersTitles] = useState<string[]>(
     []
   )
+  const [selected, setSelected] = useState<boolean>(false)
   const { session } = useSession()
 
   useEffect(() => {
@@ -44,7 +46,7 @@ const FolderPickerModal = ({
   const handleFolderPress = async (folderId: string, folderTitle: string) => {
     try {
       setPreviousFoldersId((prev) => [...prev, currentFolderId])
-      setPreviousFoldersTitle((prev) => [...prev, currentFolderTitle])
+      setPreviousFoldersTitles((prev) => [...prev, currentFolderTitle])
       setCurrentFolderId(folderId)
       setCurrentFolderTitle(folderTitle)
       const fetchedFolders = await getFolders(session!, folderId)
@@ -57,9 +59,15 @@ const FolderPickerModal = ({
   const handleBackPress = () => {
     const lastFolderId = previousFoldersId.pop()
     const lastFolderTitle = previousFoldersTitles.pop()
-    fetchFolders(lastFolderId || "home")
-    setCurrentFolderId(lastFolderId || "home")
-    setCurrentFolderTitle(lastFolderTitle || "Home")
+    if (lastFolderId === undefined) {
+      onClose()
+      setPreviousFoldersId([])
+      setPreviousFoldersTitles([])
+    } else {
+      fetchFolders(lastFolderId || "home")
+      setCurrentFolderId(lastFolderId || "home")
+      setCurrentFolderTitle(lastFolderTitle || "Home")
+    }
   }
 
   const handleSelect = () => {
@@ -78,29 +86,26 @@ const FolderPickerModal = ({
 
   return (
     <View style={styles.container}>
-      {currentFolderId !== "home" && (
+      <View style={styles.header}>
         <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
-          <Text style={styles.backButtonText}>Back</Text>
+          <AntDesign name="arrowleft" size={24} color="black" />
         </TouchableOpacity>
-      )}
+        <Text style={styles.headerText}>{currentFolderTitle}</Text>
+        <TouchableOpacity
+          onPress={() => handleSelect()}
+          style={styles.checkButton}
+        >
+          <View style={{ left: 15 }}>
+            <AntDesign name="check" size={24} />
+          </View>
+        </TouchableOpacity>
+      </View>
+
       <FlatList
         data={folders}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
       />
-      <TouchableOpacity onPress={handleSelect} style={styles.selectButton}>
-        <Text style={styles.selectButtonText}>Select</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => {
-          onClose()
-          setPreviousFoldersId([])
-          setPreviousFoldersTitle([])
-        }}
-        style={styles.closeButton}
-      >
-        <Text style={styles.closeButtonText}>Close</Text>
-      </TouchableOpacity>
     </View>
   )
 }
@@ -109,7 +114,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    marginTop: 0,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "orange",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  headerText: {
+    fontWeight: "bold",
+    fontSize: 20,
+    flex: 1,
+    textAlign: "center",
+    marginRight: 30,
   },
   folderItem: {
     paddingVertical: 10,
@@ -121,29 +139,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   backButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    marginRight: 20,
   },
-  backButtonText: {
-    fontSize: 18,
-    color: "blue",
+  checkButton: {
+    marginLeft: "auto",
+    marginRight: 10, // Add some margin to separate from the text
   },
-  selectButton: {
-    backgroundColor: "blue",
-    alignItems: "center",
-    paddingVertical: 15,
-  },
-  selectButtonText: {
-    fontSize: 18,
-    color: "white",
-  },
-  closeButton: {
-    alignItems: "center",
-    padding: 20,
-  },
-  closeButtonText: {
-    fontSize: 18,
-    color: "blue",
+  checkIconContainer: {
+    marginRight: 10,
   },
 })
 
