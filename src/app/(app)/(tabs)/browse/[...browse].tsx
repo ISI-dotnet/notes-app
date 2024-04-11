@@ -42,6 +42,9 @@ const BrowseScreen = () => {
 
   const handleCreateNewFolder = async () => {
     try {
+      if (newFolderTitle === "") {
+        throw new Error("Add folder name")
+      }
       await createFolder({
         title: newFolderTitle,
         parentFolderName: currentFolderName,
@@ -109,7 +112,7 @@ const BrowseScreen = () => {
             <Button
               title="Cancel"
               onPress={() => setIsNewFolderModalVisible(false)}
-              color="gray" // Set button color to gray
+              color="#555" // Set button color to gray
             />
           </View>
         </View>
@@ -142,7 +145,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: "80%",
+    width: "60%",
   },
 })
 
