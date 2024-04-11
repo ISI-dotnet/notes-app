@@ -161,17 +161,20 @@ const NotePage = () => {
               return (
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <TouchableOpacity
-                    onPress={() => setIsDropdownOpen(!isDropdownOpen)}
+                    onPress={() => {
+                      setIsDropdownOpen(!isDropdownOpen)
+                      console.log(isDropdownOpen)
+                    }}
                   >
                     <AntDesign name="ellipsis1" size={24} color="black" />
                   </TouchableOpacity>
                   {isDropdownOpen && (
-                    <View style={{ position: "absolute", top: 40, right: 0 }}>
+                    <View style={{ position: "relative", top: 0, right: 0 }}>
                       <TouchableOpacity onPress={handleSubmit}>
-                        <Text style={{ padding: 10 }}>Save</Text>
+                        <Text style={{ padding: 1 }}>Save</Text>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={handleDeleteNote}>
-                        <Text style={{ padding: 10 }}>Delete</Text>
+                        <Text style={{ padding: 1 }}>Delete</Text>
                       </TouchableOpacity>
                     </View>
                   )}
