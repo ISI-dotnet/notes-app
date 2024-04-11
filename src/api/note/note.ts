@@ -10,6 +10,7 @@ import {
   getDoc,
   doc,
   setDoc,
+  deleteDoc,
 } from "firebase/firestore"
 
 export const createNote = async (
@@ -71,3 +72,13 @@ export const getNoteById = async (noteId: string) => {
       throw error
     })
 }
+
+export const deleteNote = async (noteId: string) => {
+  const noteRef = doc(db, "notes", noteId);
+
+  return deleteDoc(noteRef)
+    .then(() => "Note deleted successfully")
+    .catch((error) => {
+      throw new Error("Error deleting note: " + error.message);
+    });
+};

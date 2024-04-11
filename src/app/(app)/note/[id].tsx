@@ -16,7 +16,12 @@ import { RichEditor } from "react-native-pell-rich-editor"
 import Toolbar from "@/src/components/note/Toolbar"
 import RichTextEditor from "@/src/components/note/RichTextEditor"
 import { Note } from "@/src/types/Note"
-import { createNote, getNoteById, updateNote } from "@/src/api/note/note"
+import {
+  createNote,
+  getNoteById,
+  updateNote,
+  deleteNote,
+} from "@/src/api/note/note"
 import { useLoader } from "@/src/context/useLoader"
 import Loader from "@/src/components/Loader"
 import { useSession } from "@/src/context/useSession"
@@ -47,6 +52,7 @@ const NotePage = () => {
 
   const [isFocused, setIsFocused] = useState(false)
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   // TODO: handle errors with toast, modal or smth
   const handleSubmit = () => {
@@ -55,6 +61,7 @@ const NotePage = () => {
       updateNote(updatedNote)
         .then(() => router.back())
         .catch((error) => console.log(error))
+      setIsDropdownOpen(false)
     } else {
       createNote(noteDetails)
         .then(() => router.back())
@@ -73,6 +80,15 @@ const NotePage = () => {
       parentFolderId: folderId,
     }))
     console.log("New folder title" + folderTitle)
+  }
+
+  const handleDeleteNote = () => {
+    deleteNote(id)
+      .then(() => {
+        router.back()
+      })
+      .catch((error) => console.log(error))
+    setIsDropdownOpen(false)
   }
 
   useEffect(() => {
@@ -131,14 +147,38 @@ const NotePage = () => {
           headerStyle: {
             backgroundColor: "orange",
           },
-          headerRight: () => (
-            <AntDesign
-              name="check"
-              size={24}
-              color="black"
-              onPress={handleSubmit}
-            />
-          ),
+          headerRight: () => {
+            if (id === "0") {
+              return (
+                <AntDesign
+                  name="check"
+                  size={24}
+                  color="black"
+                  onPress={handleSubmit}
+                />
+              )
+            } else {
+              return (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <TouchableOpacity
+                    onPress={() => setIsDropdownOpen(!isDropdownOpen)}
+                  >
+                    <AntDesign name="ellipsis1" size={24} color="black" />
+                  </TouchableOpacity>
+                  {isDropdownOpen && (
+                    <View style={{ position: "absolute", top: 40, right: 0 }}>
+                      <TouchableOpacity onPress={handleSubmit}>
+                        <Text style={{ padding: 10 }}>Save</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={handleDeleteNote}>
+                        <Text style={{ padding: 10 }}>Delete</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
+              )
+            }
+          },
           headerTitle: () => (
             <TouchableOpacity
               onPress={() => setIsFolderPickerModalVisible(true)}
