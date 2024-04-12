@@ -26,6 +26,10 @@ import { useLoader } from "@/src/context/useLoader"
 import Loader from "@/src/components/Loader"
 import { useSession } from "@/src/context/useSession"
 import { useNavigation } from "expo-router"
+import { toastFirebaseErrors } from "@/src/utils/toastFirebaseErrors"
+import { showToast } from "@/src/utils/showToast"
+import { UNKNOWN_ERROR_MESSAGE } from "@/src/constants/ErrorMessages"
+import { convertToPlainText } from "@/src/utils/convertToPlainText"
 import FolderPickerModal from "@/src/components/modals/FolderPickerModal"
 
 const NotePage = () => {
@@ -40,6 +44,7 @@ const NotePage = () => {
     userId: session!,
     title: "",
     description: "",
+    richTextDescription: "",
     parentFolderName: "Home",
     parentFolderId: "home",
   })
@@ -54,18 +59,36 @@ const NotePage = () => {
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
-  // TODO: handle errors with toast, modal or smth
   const handleSubmit = () => {
+    if (noteDetails.title === "") {
+      showToast("info", "Note can't be saved without a title")
+      return
+    }
+    noteDetails.description = convertToPlainText(
+      noteDetails.richTextDescription
+    )
     if (id !== "0") {
       const updatedNote = { id: id, ...noteDetails }
       updateNote(updatedNote)
         .then(() => router.back())
-        .catch((error) => console.log(error))
+        .catch((error) => {
+          if (error.message) {
+            toastFirebaseErrors(error.message)
+          } else {
+            showToast("error", UNKNOWN_ERROR_MESSAGE)
+          }
+        })
       setIsDropdownOpen(false)
     } else {
       createNote(noteDetails)
         .then(() => router.back())
-        .catch((error) => console.log(error))
+        .catch((error) => {
+          if (error.message) {
+            toastFirebaseErrors(error.message)
+          } else {
+            showToast("error", UNKNOWN_ERROR_MESSAGE)
+          }
+        })
     }
   }
 
@@ -79,7 +102,6 @@ const NotePage = () => {
       parentFolderName: folderTitle,
       parentFolderId: folderId,
     }))
-    console.log("New folder title" + folderTitle)
   }
 
   const handleDeleteNote = () => {
@@ -155,6 +177,7 @@ const NotePage = () => {
                   size={24}
                   color="black"
                   onPress={handleSubmit}
+                  style={{ opacity: noteDetails.title === "" ? 0.3 : 1 }}
                 />
               )
             } else {
@@ -163,7 +186,6 @@ const NotePage = () => {
                   <TouchableOpacity
                     onPress={() => {
                       setIsDropdownOpen(!isDropdownOpen)
-                      console.log(isDropdownOpen)
                     }}
                   >
                     <AntDesign name="ellipsis1" size={24} color="black" />
@@ -195,7 +217,7 @@ const NotePage = () => {
           ),
         }}
       />
-      {loading || (id !== "0" && noteDetails.title === "") ? (
+      {loading || (id !== "0" && noteDetails.dateCreated === undefined) ? (
         <Loader />
       ) : (
         <ScrollView
@@ -223,13 +245,13 @@ const NotePage = () => {
               handleChange={(descriptionText) =>
                 setNoteDetails((oldValue) => ({
                   ...oldValue,
-                  description: descriptionText,
+                  richTextDescription: descriptionText,
                 }))
               }
               ref={richText}
               setIsFocused={setIsFocused}
               handleScroll={handleScroll}
-              noteDescription={noteDetails.description}
+              noteDescription={noteDetails.richTextDescription}
             />
           </KeyboardAvoidingView>
         </ScrollView>

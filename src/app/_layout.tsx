@@ -5,6 +5,7 @@ import { ThemeProvider } from "@react-navigation/native"
 import { useEffect } from "react"
 import { useFonts } from "expo-font"
 import FontAwesome from "@expo/vector-icons/FontAwesome"
+import Toast from "react-native-toast-message"
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -56,6 +57,7 @@ function Root() {
       <LoaderProvider>
         <ThemeProvider value={MyTheme}>
           <Slot />
+          <Toast topOffset={60} />
         </ThemeProvider>
       </LoaderProvider>
     </SessionProvider>
