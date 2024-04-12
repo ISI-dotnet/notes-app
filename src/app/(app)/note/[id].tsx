@@ -51,9 +51,7 @@ const NotePage = () => {
 
   const richText = useRef<RichEditor | null>(null)
   const scrollRef = useRef<ScrollView | null>(null)
-
-  const [selectedFolderId, setSelectedFolderId] = useState("")
-  const [selectedFolderTitle, setSelectedFolderTitle] = useState("Home")
+  const [selectedFolderTitle, setSelectedFolderTitle] = useState("")
 
   const [isFocused, setIsFocused] = useState(false)
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
@@ -93,7 +91,6 @@ const NotePage = () => {
   }
 
   const handleSelectFolder = (folderId: string, folderTitle: string) => {
-    setSelectedFolderId(folderId)
     setSelectedFolderTitle(folderTitle)
     setIsFolderPickerModalVisible(false)
     // Update note details with selected folder
@@ -115,12 +112,15 @@ const NotePage = () => {
 
   useEffect(() => {
     const getNoteDetails = async () => {
+      setIsLoading(true)
       if (id !== "0") {
-        setIsLoading(true)
         const note = await getNoteById(id)
         setNoteDetails(note)
-        setIsLoading(false)
+        setSelectedFolderTitle(note.parentFolderName)
+      } else {
+        setSelectedFolderTitle("Home")
       }
+      setIsLoading(false)
     }
     const unsubscribe = navigation.addListener("transitionEnd" as any, () => {
       getNoteDetails()
@@ -209,10 +209,12 @@ const NotePage = () => {
               onPress={() => setIsFolderPickerModalVisible(true)}
               style={{ alignItems: "center" }}
             >
-              <Text style={{ fontWeight: "bold", fontSize: 20 }}>
-                Folder: {selectedFolderTitle}
-                <AntDesign name="down" size={15} color="black" />
-              </Text>
+              {!loading && selectedFolderTitle !== "" && (
+                <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+                  Folder: {selectedFolderTitle}
+                  <AntDesign name="down" size={15} color="black" style={{}} />
+                </Text>
+              )}
             </TouchableOpacity>
           ),
         }}
