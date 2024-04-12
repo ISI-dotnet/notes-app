@@ -1,5 +1,5 @@
 import { Stack, useLocalSearchParams, router } from "expo-router"
-import { AntDesign } from "@expo/vector-icons"
+import { AntDesign, MaterialIcons } from "@expo/vector-icons"
 import React, { useEffect, useRef, useState } from "react"
 import {
   Keyboard,
@@ -51,9 +51,7 @@ const NotePage = () => {
 
   const richText = useRef<RichEditor | null>(null)
   const scrollRef = useRef<ScrollView | null>(null)
-
-  const [selectedFolderId, setSelectedFolderId] = useState("")
-  const [selectedFolderTitle, setSelectedFolderTitle] = useState("Home")
+  const [selectedFolderTitle, setSelectedFolderTitle] = useState("")
 
   const [isFocused, setIsFocused] = useState(false)
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
@@ -93,7 +91,6 @@ const NotePage = () => {
   }
 
   const handleSelectFolder = (folderId: string, folderTitle: string) => {
-    setSelectedFolderId(folderId)
     setSelectedFolderTitle(folderTitle)
     setIsFolderPickerModalVisible(false)
     // Update note details with selected folder
@@ -115,12 +112,15 @@ const NotePage = () => {
 
   useEffect(() => {
     const getNoteDetails = async () => {
+      setIsLoading(true)
       if (id !== "0") {
-        setIsLoading(true)
         const note = await getNoteById(id)
         setNoteDetails(note)
-        setIsLoading(false)
+        setSelectedFolderTitle(note.parentFolderName)
+      } else {
+        setSelectedFolderTitle("Home")
       }
+      setIsLoading(false)
     }
     const unsubscribe = navigation.addListener("transitionEnd" as any, () => {
       getNoteDetails()
@@ -170,8 +170,16 @@ const NotePage = () => {
             backgroundColor: "orange",
           },
           headerRight: () => {
-            if (id === "0") {
-              return (
+            return (
+              <View className="flex-row gap-3">
+                {id !== "0" && (
+                  <MaterialIcons
+                    name="delete-forever"
+                    size={24}
+                    color="black"
+                    onPress={handleDeleteNote}
+                  />
+                )}
                 <AntDesign
                   name="check"
                   size={24}
@@ -179,41 +187,23 @@ const NotePage = () => {
                   onPress={handleSubmit}
                   style={{ opacity: noteDetails.title === "" ? 0.3 : 1 }}
                 />
-              )
-            } else {
-              return (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      setIsDropdownOpen(!isDropdownOpen)
-                    }}
-                  >
-                    <AntDesign name="ellipsis1" size={24} color="black" />
-                  </TouchableOpacity>
-                  {isDropdownOpen && (
-                    <View style={{ position: "relative", top: 0, right: 0 }}>
-                      <TouchableOpacity onPress={handleSubmit}>
-                        <Text style={{ padding: 1 }}>Save</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity onPress={handleDeleteNote}>
-                        <Text style={{ padding: 1 }}>Delete</Text>
-                      </TouchableOpacity>
-                    </View>
-                  )}
-                </View>
-              )
-            }
+              </View>
+            )
           },
           headerTitle: () => (
-            <TouchableOpacity
-              onPress={() => setIsFolderPickerModalVisible(true)}
-              style={{ alignItems: "center" }}
-            >
-              <Text style={{ fontWeight: "bold", fontSize: 20 }}>
-                Folder: {selectedFolderTitle}
-                <AntDesign name="down" size={15} color="black" />
-              </Text>
-            </TouchableOpacity>
+            <>
+              {!loading && selectedFolderTitle !== "" && (
+                <TouchableOpacity
+                  onPress={() => setIsFolderPickerModalVisible(true)}
+                  className="flex-row justify-start items-center"
+                >
+                  <Text className="font-bold text-xl w-3/4" numberOfLines={1}>
+                    Folder: {selectedFolderTitle}
+                  </Text>
+                  <AntDesign name="down" size={15} color="black" style={{}} />
+                </TouchableOpacity>
+              )}
+            </>
           ),
         }}
       />

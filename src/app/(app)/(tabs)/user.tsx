@@ -6,7 +6,6 @@ import { MaterialIcons } from "@expo/vector-icons"
 import { toastFirebaseErrors } from "@/src/utils/toastFirebaseErrors"
 import { showToast } from "@/src/utils/showToast"
 import { UNKNOWN_ERROR_MESSAGE } from "@/src/constants/ErrorMessages"
-import { Stack } from "expo-router"
 
 const UserPage = () => {
   const { signOut } = useSession()

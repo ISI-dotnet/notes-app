@@ -24,6 +24,7 @@ const TabLayout = () => {
       <Tabs.Screen
         name="index"
         options={{
+          unmountOnBlur: true,
           headerShown: false,
           title: "Home",
           tabBarIcon: ({ color }) => (
@@ -44,6 +45,7 @@ const TabLayout = () => {
       <Tabs.Screen
         name="browse/[...browse]"
         options={{
+          unmountOnBlur: true,
           tabBarLabel: "Browse",
           tabBarIcon: ({ color }) => (
             <Feather name="folder-minus" size={24} color={color} />
@@ -52,7 +54,7 @@ const TabLayout = () => {
         initialParams={{
           browse: ["Home"],
           currentFolderId: "home",
-          previousFolderId: "",
+          previousFolderId: "home",
         }}
       />
       <Tabs.Screen

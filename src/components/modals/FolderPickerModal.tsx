@@ -8,7 +8,7 @@ import {
 } from "react-native"
 import { AntDesign } from "@expo/vector-icons"
 import { NoteFolder } from "@/src/types/NoteFolder"
-import { getFolders } from "@/src/api/note/folder"
+import { getFoldersByFolderId } from "@/src/api/note/folder"
 import { useSession } from "@/src/context/useSession"
 
 type FolderPickerModalProps = {
@@ -36,7 +36,7 @@ const FolderPickerModal = ({
 
   const fetchFolders = async (folderId: string) => {
     try {
-      const fetchedFolders = await getFolders(session!, folderId)
+      const fetchedFolders = await getFoldersByFolderId(session!, folderId)
       setFolders(fetchedFolders)
     } catch (error) {
       console.error("Error fetching folders:", error)
@@ -49,7 +49,7 @@ const FolderPickerModal = ({
       setPreviousFoldersTitles((prev) => [...prev, currentFolderTitle])
       setCurrentFolderId(folderId)
       setCurrentFolderTitle(folderTitle)
-      const fetchedFolders = await getFolders(session!, folderId)
+      const fetchedFolders = await getFoldersByFolderId(session!, folderId)
       setFolders(fetchedFolders)
     } catch (error) {
       console.error("Error fetching folders:", error)

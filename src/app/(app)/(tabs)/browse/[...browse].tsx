@@ -67,7 +67,7 @@ const BrowseScreen = () => {
             backgroundColor: "orange",
           },
           headerLeft: () =>
-            previousFolderId !== "sa" ? (
+            currentFolderId !== "home" ? (
               <Feather
                 style={{ paddingLeft: 16 }}
                 name="arrow-left"
