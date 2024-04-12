@@ -13,6 +13,7 @@ import {
   onSnapshot,
   orderBy,
   limit,
+  deleteDoc,
 } from "firebase/firestore"
 
 export const createNote = async (
@@ -141,4 +142,14 @@ export const subscribeToRecentNotes = (
 
     callback(recentNotes)
   })
+}
+
+export const deleteNote = async (noteId: string) => {
+  const noteRef = doc(db, "notes", noteId)
+
+  return deleteDoc(noteRef)
+    .then(() => "Note deleted successfully")
+    .catch((error) => {
+      throw new Error("Error deleting note: " + error.message)
+    })
 }

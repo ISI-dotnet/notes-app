@@ -3,6 +3,7 @@ export type NoteFolder = {
   title: string
   parentFolderName: string
   parentFolderId: string
+  userId: string
   dateCreated?: Date
   dateModified?: Date
 }

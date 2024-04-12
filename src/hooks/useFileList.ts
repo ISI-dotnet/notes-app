@@ -57,7 +57,6 @@ const useFileList = (currentFolderId: string) => {
     setIsLoading(false)
 
     return () => {
-      console.log("called")
       unsubscribeNotes()
 
       unsubscribeFolders()

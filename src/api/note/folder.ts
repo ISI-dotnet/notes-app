@@ -6,6 +6,8 @@ import {
   onSnapshot,
   query,
   where,
+  addDoc,
+  serverTimestamp,
 } from "firebase/firestore"
 
 export const getFoldersByFolderId = async (
@@ -70,4 +72,18 @@ export const subscribeToFoldersByFolderId = (
     })
     callback(existingFolders)
   })
+}
+
+export const createFolder = async (
+  folderDetails: Omit<NoteFolder, "id" | "dateCreated" | "dateModified">
+) => {
+  return addDoc(collection(db, "folders"), {
+    ...folderDetails,
+    dateCreated: serverTimestamp(),
+    dateModified: serverTimestamp(),
+  })
+    .then((docRef) => docRef)
+    .catch((error) => {
+      throw error
+    })
 }
