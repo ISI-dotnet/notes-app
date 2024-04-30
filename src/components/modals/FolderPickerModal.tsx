@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  Modal,
 } from "react-native"
 import { AntDesign } from "@expo/vector-icons"
 import { NoteFolder } from "@/src/types/NoteFolder"
@@ -14,11 +15,15 @@ import { useSession } from "@/src/context/useSession"
 type FolderPickerModalProps = {
   onSelectFolder: (folderId: string, folderTitle: string) => void
   onClose: () => void
+  isFolderPickerModalVisible: boolean
+  setIsFolderPickerModalVisible: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const FolderPickerModal = ({
   onSelectFolder,
   onClose,
+  isFolderPickerModalVisible,
+  setIsFolderPickerModalVisible,
 }: FolderPickerModalProps) => {
   const [folders, setFolders] = useState<NoteFolder[]>([])
   const [currentFolderId, setCurrentFolderId] = useState<string>("home")
@@ -27,7 +32,6 @@ const FolderPickerModal = ({
   const [previousFoldersTitles, setPreviousFoldersTitles] = useState<string[]>(
     []
   )
-  const [selected, setSelected] = useState<boolean>(false)
   const { session } = useSession()
 
   useEffect(() => {
@@ -85,28 +89,35 @@ const FolderPickerModal = ({
   )
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
-          <AntDesign name="arrowleft" size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>{currentFolderTitle}</Text>
-        <TouchableOpacity
-          onPress={() => handleSelect()}
-          style={styles.checkButton}
-        >
-          <View style={{ left: 15 }}>
-            <AntDesign name="check" size={24} />
-          </View>
-        </TouchableOpacity>
-      </View>
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={isFolderPickerModalVisible}
+      onRequestClose={() => setIsFolderPickerModalVisible(false)}
+    >
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
+            <AntDesign name="arrowleft" size={24} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.headerText}>{currentFolderTitle}</Text>
+          <TouchableOpacity
+            onPress={() => handleSelect()}
+            style={styles.checkButton}
+          >
+            <View style={{ left: 15 }}>
+              <AntDesign name="check" size={24} />
+            </View>
+          </TouchableOpacity>
+        </View>
 
-      <FlatList
-        data={folders}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-      />
-    </View>
+        <FlatList
+          data={folders}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+        />
+      </View>
+    </Modal>
   )
 }
 
