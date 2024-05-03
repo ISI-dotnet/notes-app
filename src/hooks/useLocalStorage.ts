@@ -12,21 +12,7 @@ interface StorageData {
 
 const useLocalStorage = () => {
   const [storage, setStorage] = useState<StorageData>({})
-
-  useEffect(() => {
-    const loadStorage = async () => {
-      try {
-        const storedData = await AsyncStorage.getItem("@notificationStorage")
-        if (storedData !== null) {
-          setStorage(JSON.parse(storedData))
-        }
-      } catch (error) {
-        console.error("Error loading data from AsyncStorage:", error)
-      }
-    }
-
-    loadStorage()
-  }, []) // Added storage to the dependency array
+  const [loading, setLoading] = useState(true) // Add loading state
 
   const saveStorage = async (data: StorageData) => {
     try {
@@ -52,23 +38,30 @@ const useLocalStorage = () => {
     await saveStorage(newStorage)
   }
 
-  const editNotification = async (
-    noteId: string,
-    newNotificationId: string,
-    newDate: Date
-  ) => {
-    const newStorage = {
-      ...storage,
-      [noteId]: { notificationId: newNotificationId, date: newDate },
+  useEffect(() => {
+    const loadStorage = () => {
+      AsyncStorage.getItem("@notificationStorage")
+        .then((storedData) => {
+          if (storedData !== null) {
+            setStorage(JSON.parse(storedData))
+          }
+        })
+        .catch((error) => {
+          console.error("Error loading data from AsyncStorage:", error)
+        })
+        .finally(() => {
+          setLoading(false)
+        })
     }
-    await saveStorage(newStorage)
-  }
+
+    loadStorage()
+  }, [])
 
   return {
     storage,
+    isStorageLoading: loading,
     addNotification,
     removeNotification,
-    editNotification,
   }
 }
 

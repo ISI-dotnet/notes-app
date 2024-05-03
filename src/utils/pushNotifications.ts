@@ -13,3 +13,7 @@ export async function schedulePushNotification(
     trigger: { date: reminderDate },
   })
 }
+
+export async function cancelNotification(notificationId: string) {
+  await Notifications.cancelScheduledNotificationAsync(notificationId)
+}

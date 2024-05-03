@@ -1,13 +1,16 @@
+import { COLORS } from "@/src/constants/Colors"
 import useLocalStorage from "@/src/hooks/useLocalStorage"
 import { usePushNotification } from "@/src/hooks/usePushNotifications"
 import { Note } from "@/src/types/Note"
+import { cancelNotification } from "@/src/utils/pushNotifications"
+import { showToast } from "@/src/utils/showToast"
 import { AntDesign } from "@expo/vector-icons"
 import DateTimePicker, {
   AndroidNativeProps,
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   Button,
   Modal,
@@ -17,48 +20,37 @@ import {
   View,
 } from "react-native"
 type ReminderPickerModalProps = {
+  notificationId: string
   date: Date | undefined
   setDate: React.Dispatch<React.SetStateAction<Date | undefined>>
-  defaultDate: Date | undefined
-  previousSelectedDate: Date | undefined
-  setPreviousSelectedDate: React.Dispatch<
-    React.SetStateAction<Date | undefined>
-  >
-  setNoteDetails: React.Dispatch<React.SetStateAction<Note | Omit<Note, "id">>>
   isReminderPickerModalVisible: boolean
   setIsReminderPickerModalVisible: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const ReminderPickerModal = ({
+  notificationId,
   date,
   setDate,
-  defaultDate,
-  previousSelectedDate,
-  setPreviousSelectedDate,
-  setNoteDetails,
   isReminderPickerModalVisible,
   setIsReminderPickerModalVisible,
 }: ReminderPickerModalProps) => {
-  const handleReminderDateSelect = (date: Date) => {
-    setNoteDetails((oldValue) => ({ ...oldValue, reminder: { date: date } }))
-    // You can perform any additional logic here, such as posting data to the database
-    console.log("Selected date:", date)
-  }
+  const { storage, removeNotification } = useLocalStorage()
 
-  const { storage } = useLocalStorage()
-
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>()
   const { expoPushToken, notification } = usePushNotification()
-
   const [mode, setMode] = useState<AndroidNativeProps["mode"]>("date")
   const [show, setShow] = useState(false)
 
+  useEffect(() => {
+    setSelectedDate(date)
+  }, [date])
+  console.log(storage)
   const onChange = (
     event: DateTimePickerEvent,
     selectedDate: Date | undefined
   ) => {
-    const currentDate = selectedDate
     setShow(false)
-    setDate(currentDate)
+    setSelectedDate(selectedDate)
   }
 
   const showMode = (currentMode: AndroidNativeProps["mode"]) => {
@@ -74,13 +66,30 @@ const ReminderPickerModal = ({
     showMode("time")
   }
 
+  const handleRemovePress = async () => {
+    if (notificationId !== "0") {
+      await cancelNotification(notificationId)
+      removeNotification(notificationId)
+    }
+    setDate(undefined)
+
+    setIsReminderPickerModalVisible(false)
+  }
+
   const handleCancelPress = () => {
-    setDate(previousSelectedDate)
+    setSelectedDate(date)
     setIsReminderPickerModalVisible(false)
   }
 
   const handleAddPress = () => {
-    setPreviousSelectedDate(date)
+    if (!selectedDate) {
+      showToast("error", "Please select reminder date and time!")
+      return
+    } else if (selectedDate < new Date()) {
+      showToast("error", "Notification time can't be in the past!")
+      return
+    }
+    setDate(selectedDate)
     setIsReminderPickerModalVisible(false)
   }
   return (
@@ -103,19 +112,25 @@ const ReminderPickerModal = ({
             <AntDesign name="close" size={24} color="black" />
           </TouchableOpacity>
           <View className="pb-8 px-8">
-            <Text>Please select reminder date and time</Text>
-            <Button onPress={showDatepicker} title="Show date picker!" />
-            <Button onPress={showTimepicker} title="Show time picker!" />
-            {date ? (
-              <Text>selected: {date.toLocaleString()}</Text>
-            ) : (
-              <Text>No reminder selected</Text>
-            )}
+            <Text className="text-center text-xl mb-7">
+              Please select reminder date and time
+            </Text>
+            <View className="flex-row justify-between mb-4">
+              <Button onPress={showDatepicker} title="Select date" />
+              <Button onPress={showTimepicker} title="Select time" />
+            </View>
+            <Text className="text-center text-lg bg-gray-800 text-white rounded-xl py-6 px-4">
+              {selectedDate
+                ? `Selected: ${selectedDate.toLocaleString()}`
+                : date
+                ? `Selected: ${date.toLocaleString()}`
+                : `No reminder selected`}
+            </Text>
           </View>
           <View className="flex-row gap-2 justify-end pb-6 px-6">
-            {defaultDate && (
+            {date && (
               <TouchableOpacity
-                onPress={() => setIsReminderPickerModalVisible(false)}
+                onPress={handleRemovePress}
                 className="mr-auto px-3 py-2 bg-red-500 rounded-md"
               >
                 <Text className="text-zinc-100">REMOVE</Text>
@@ -140,7 +155,7 @@ const ReminderPickerModal = ({
       {show && (
         <DateTimePicker
           minimumDate={new Date()}
-          value={date ?? new Date()}
+          value={selectedDate ?? new Date()}
           mode={mode}
           is24Hour={true}
           onChange={onChange}

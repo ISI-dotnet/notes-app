@@ -63,18 +63,10 @@ const NotePage = () => {
   const [isFocused, setIsFocused] = useState(false)
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
 
-  const { storage, addNotification, editNotification, removeNotification } =
+  const { storage, isStorageLoading, addNotification, removeNotification } =
     useLocalStorage()
-  let defaultDate: Date | undefined
-  if ("id" in noteDetails) {
-    // `noteDetails` has an `id` property
-    defaultDate = storage[noteDetails.id]?.date
-  }
 
   const [reminderDate, setReminderDate] = useState<Date | undefined>()
-  const [previousSelectedDate, setPreviousSelectedDate] = useState<
-    Date | undefined
-  >(defaultDate)
 
   const handleSubmit = async () => {
     if (noteDetails.title === "") {
@@ -143,20 +135,28 @@ const NotePage = () => {
   useEffect(() => {
     const getNoteDetails = async () => {
       setIsLoading(true)
-      if (id !== "0") {
-        const note = await getNoteById(id)
-        setNoteDetails(note)
-        setSelectedFolderTitle(note.parentFolderName)
-      } else {
-        setSelectedFolderTitle("Home")
+      if (!isStorageLoading) {
+        if (id !== "0") {
+          const note = await getNoteById(id)
+          setNoteDetails(note)
+          setSelectedFolderTitle(note.parentFolderName)
+          const savedDate = storage[note.id]?.date
+          if (savedDate) {
+            const convertedDate = new Date(savedDate)
+            setReminderDate(convertedDate)
+          }
+        } else {
+          setSelectedFolderTitle("Home")
+        }
       }
       setIsLoading(false)
     }
     const unsubscribe = navigation.addListener("transitionEnd" as any, () => {
       getNoteDetails()
     })
+
     return unsubscribe
-  }, [navigation])
+  }, [navigation, isStorageLoading])
 
   // effect used for showing and hiding note styling toolbar based on keyboard visibility on screen
   useEffect(() => {
@@ -303,14 +303,11 @@ const NotePage = () => {
       />
 
       <ReminderPickerModal
+        notificationId={id}
         date={reminderDate}
         setDate={setReminderDate}
-        defaultDate={defaultDate}
-        previousSelectedDate={previousSelectedDate}
-        setPreviousSelectedDate={setPreviousSelectedDate}
         isReminderPickerModalVisible={isReminderOptionsModalVisible}
         setIsReminderPickerModalVisible={setIsReminderOptionsModalVisible}
-        setNoteDetails={setNoteDetails}
       />
     </View>
   )
