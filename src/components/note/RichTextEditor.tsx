@@ -1,6 +1,7 @@
 import { COLORS } from "@/src/constants/Colors"
 import { useTheme } from "@react-navigation/native"
 import { forwardRef } from "react"
+import { ScrollView } from "react-native"
 import { RichEditor } from "react-native-pell-rich-editor"
 
 type RichTextEditorProps = {
@@ -14,24 +15,26 @@ const RichTextEditor = forwardRef<RichEditor, RichTextEditorProps>(
   ({ setIsFocused, handleScroll, handleChange, noteDescription }, ref) => {
     const { colors } = useTheme()
     return (
-      <RichEditor
-        showsVerticalScrollIndicator={false}
-        initialContentHTML={noteDescription}
-        placeholder="Note"
-        style={{ marginHorizontal: 4 }}
-        editorStyle={{
-          backgroundColor: colors.background,
-          placeholderColor: "#606060",
-          caretColor: COLORS.darkOrange,
-        }}
-        ref={ref}
-        onChange={handleChange}
-        onFocus={() => {
-          setIsFocused(true)
-        }}
-        onBlur={() => setIsFocused(false)}
-        onCursorPosition={(scrollY) => handleScroll(scrollY)}
-      />
+      <ScrollView>
+        <RichEditor
+          showsVerticalScrollIndicator={false}
+          initialContentHTML={noteDescription}
+          placeholder="Note"
+          style={{ marginHorizontal: 4 }}
+          editorStyle={{
+            backgroundColor: colors.background,
+            placeholderColor: "#606060",
+            caretColor: COLORS.darkOrange,
+          }}
+          ref={ref}
+          onChange={handleChange}
+          onFocus={() => {
+            setIsFocused(true)
+          }}
+          onBlur={() => setIsFocused(false)}
+          onCursorPosition={(scrollY) => handleScroll(scrollY)}
+        />
+      </ScrollView>
     )
   }
 )

@@ -26,7 +26,7 @@ const useLocalStorage = () => {
     }
 
     loadStorage()
-  }, [storage]) // Added storage to the dependency array
+  }, []) // Added storage to the dependency array
 
   const saveStorage = async (data: StorageData) => {
     try {

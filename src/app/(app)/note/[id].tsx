@@ -111,7 +111,7 @@ const NotePage = () => {
           )
           addNotification(newNoteId, notificationId, reminderDate)
         }
-      } catch (error) {
+      } catch (error: any) {
         if (error.message) {
           toastFirebaseErrors(error.message)
         } else {

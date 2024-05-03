@@ -49,7 +49,6 @@ const ReminderPickerModal = ({
 
   const { expoPushToken, notification } = usePushNotification()
 
-  console.log(date)
   const [mode, setMode] = useState<AndroidNativeProps["mode"]>("date")
   const [show, setShow] = useState(false)
 
