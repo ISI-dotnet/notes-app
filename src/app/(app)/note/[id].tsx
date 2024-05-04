@@ -8,7 +8,6 @@ import {
   ScrollView,
   TextInput,
   View,
-  Modal,
   TouchableOpacity,
   Text,
 } from "react-native"
@@ -33,12 +32,8 @@ import { convertToPlainText } from "@/src/utils/convertToPlainText"
 import FolderPickerModal from "@/src/components/modals/FolderPickerModal"
 import { SafeAreaView } from "react-native-safe-area-context"
 import ReminderPickerModal from "@/src/components/modals/ReminderPickerModal"
-import { COLORS } from "@/src/constants/Colors"
 import useLocalStorage from "@/src/hooks/useLocalStorage"
-import {
-  cancelNotification,
-  schedulePushNotification,
-} from "@/src/utils/pushNotifications"
+import { schedulePushNotification } from "@/src/utils/pushNotifications"
 
 const NotePage = () => {
   const { id }: { id: string } = useLocalSearchParams()
@@ -82,29 +77,12 @@ const NotePage = () => {
     if (id !== "0") {
       const updatedNote = { id: id, ...noteDetails }
       updateNote(updatedNote)
-        .then(async () => {
-          router.back()
-          if (reminderDate) {
-            const previousReminderDate = new Date(storage[id]?.date)
-            if (previousReminderDate !== reminderDate) {
-              await cancelNotification(id)
-              removeNotification(id)
-            }
-            const notificationId = await schedulePushNotification(
-              reminderDate,
-              "Reminder",
-              `Note: ${noteDetails.title}`
-            )
-            addNotification(id, notificationId, reminderDate)
-          }
-        })
+        .then(() => router.back())
         .catch((error) => {
           if (error.message) {
             toastFirebaseErrors(error.message)
-            return
           } else {
             showToast("error", UNKNOWN_ERROR_MESSAGE)
-            return
           }
         })
     } else {
@@ -321,7 +299,8 @@ const NotePage = () => {
       />
 
       <ReminderPickerModal
-        notificationId={id}
+        noteId={id}
+        noteDetails={noteDetails}
         date={reminderDate}
         setDate={setReminderDate}
         isReminderPickerModalVisible={isReminderOptionsModalVisible}

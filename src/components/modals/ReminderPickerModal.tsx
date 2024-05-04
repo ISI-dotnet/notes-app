@@ -2,7 +2,10 @@ import { COLORS } from "@/src/constants/Colors"
 import useLocalStorage from "@/src/hooks/useLocalStorage"
 import { usePushNotification } from "@/src/hooks/usePushNotifications"
 import { Note } from "@/src/types/Note"
-import { cancelNotification } from "@/src/utils/pushNotifications"
+import {
+  cancelNotification,
+  schedulePushNotification,
+} from "@/src/utils/pushNotifications"
 import { showToast } from "@/src/utils/showToast"
 import { AntDesign } from "@expo/vector-icons"
 import DateTimePicker, {
@@ -20,7 +23,8 @@ import {
   View,
 } from "react-native"
 type ReminderPickerModalProps = {
-  notificationId: string
+  noteId: string
+  noteDetails: Note | Omit<Note, "id">
   date: Date | undefined
   setDate: React.Dispatch<React.SetStateAction<Date | undefined>>
   isReminderPickerModalVisible: boolean
@@ -28,23 +32,23 @@ type ReminderPickerModalProps = {
 }
 
 const ReminderPickerModal = ({
-  notificationId,
+  noteId,
+  noteDetails,
   date,
   setDate,
   isReminderPickerModalVisible,
   setIsReminderPickerModalVisible,
 }: ReminderPickerModalProps) => {
-  const { storage, removeNotification } = useLocalStorage()
+  const { storage, addNotification, removeNotification } = useLocalStorage()
+  const { expoPushToken, notification } = usePushNotification()
 
   const [selectedDate, setSelectedDate] = useState<Date | undefined>()
-  const { expoPushToken, notification } = usePushNotification()
   const [mode, setMode] = useState<AndroidNativeProps["mode"]>("date")
   const [show, setShow] = useState(false)
 
   useEffect(() => {
     setSelectedDate(date)
   }, [date])
-  console.log(storage)
   const onChange = (
     event: DateTimePickerEvent,
     selectedDate: Date | undefined
@@ -67,9 +71,9 @@ const ReminderPickerModal = ({
   }
 
   const handleRemovePress = async () => {
-    if (notificationId !== "0") {
-      await cancelNotification(notificationId)
-      removeNotification(notificationId)
+    if (noteId !== "0") {
+      await cancelNotification(noteId)
+      removeNotification(noteId)
     }
     setDate(undefined)
 
@@ -81,7 +85,7 @@ const ReminderPickerModal = ({
     setIsReminderPickerModalVisible(false)
   }
 
-  const handleAddPress = () => {
+  const handleAddPress = async () => {
     if (!selectedDate) {
       showToast("error", "Please select reminder date and time!")
       return
@@ -89,8 +93,23 @@ const ReminderPickerModal = ({
       showToast("error", "Notification time can't be in the past!")
       return
     }
+
     setDate(selectedDate)
     setIsReminderPickerModalVisible(false)
+
+    if (noteId !== "0") {
+      const previousReminderDate = new Date(storage[noteId]?.date)
+      if (previousReminderDate.getTime() !== selectedDate.getTime()) {
+        await cancelNotification(noteId)
+        removeNotification(noteId)
+        const notificationId = await schedulePushNotification(
+          selectedDate,
+          "Reminder",
+          `Note: ${noteDetails.title}`
+        )
+        addNotification(noteId, notificationId, selectedDate)
+      }
+    }
   }
   return (
     <Modal
