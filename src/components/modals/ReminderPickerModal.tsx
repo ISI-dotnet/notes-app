@@ -72,9 +72,11 @@ const ReminderPickerModal = ({
 
   const handleRemovePress = async () => {
     if (noteId !== "0") {
-      const notificationId = storage[noteId].notificationId
-      await cancelNotification(notificationId)
-      removeNotification(noteId)
+      const notificationId = storage[noteId]?.notificationId
+      if (notificationId) {
+        await cancelNotification(notificationId)
+        removeNotification(noteId)
+      }
     }
     setDate(undefined)
 
@@ -100,17 +102,19 @@ const ReminderPickerModal = ({
 
     if (noteId !== "0") {
       const previousReminderDate = new Date(storage[noteId]?.date)
-      if (previousReminderDate.getTime() !== selectedDate.getTime()) {
-        const oldNotificationId = storage[noteId].notificationId
-        await cancelNotification(oldNotificationId)
-        removeNotification(noteId)
-        const notificationId = await schedulePushNotification(
-          selectedDate,
-          "Reminder",
-          `Note: ${noteDetails.title}`
-        )
-        addNotification(noteId, notificationId, selectedDate)
+      if (previousReminderDate) {
+        const oldNotificationId = storage[noteId]?.notificationId
+        if (oldNotificationId) {
+          await cancelNotification(oldNotificationId)
+          removeNotification(noteId)
+        }
       }
+      const notificationId = await schedulePushNotification(
+        selectedDate,
+        "Reminder",
+        `Note: ${noteDetails.title}`
+      )
+      addNotification(noteId, notificationId, selectedDate)
     }
   }
   return (
