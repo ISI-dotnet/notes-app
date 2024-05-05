@@ -1,5 +1,6 @@
-import { db } from "@/firebaseConfig"
-import { NoteFolder } from "@/src/types/NoteFolder"
+import { db } from "@/firebaseConfig";
+import { NoteFolder } from "@/src/types/NoteFolder";
+import { deleteNoteByParentFolderId } from "@/src/api/note/note";
 import {
   collection,
   getDocs,
@@ -8,15 +9,27 @@ import {
   where,
   addDoc,
   serverTimestamp,
-} from "firebase/firestore"
+  deleteDoc,
+  doc // Import deleteDoc method
+} from "firebase/firestore";
+
+export const deleteFolderAndChildren = async (folderId: string) => {
+  await deleteNoteByParentFolderId(folderId);
+  const fetchedFolders = await getDocs(
+    query(collection(db, "folders"), where("parentFolderId", "==", folderId))
+  )
+  for (const folder of fetchedFolders.docs) {
+    await deleteFolderAndChildren(folder.id)
+  }
+  await deleteDoc(doc(collection(db, "folders"), folderId))
+}
 
 export const getFoldersByFolderId = async (
   userId: string,
   parentFolderId: string
 ) => {
-  const foldersRef = collection(db, "folders")
   const q = query(
-    foldersRef,
+    collection(db, "folders"),
     where("userId", "==", userId),
     where("parentFolderId", "==", parentFolderId)
   )
@@ -40,9 +53,8 @@ export const subscribeToFoldersByFolderId = (
   existingFolders: NoteFolder[],
   callback: (folders: NoteFolder[]) => void
 ) => {
-  const foldersRef = collection(db, "folders")
   const q = query(
-    foldersRef,
+    collection(db, "folders"),
     where("userId", "==", userId),
     where("parentFolderId", "==", parentFolderId)
   )

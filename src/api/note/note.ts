@@ -153,3 +153,23 @@ export const deleteNote = async (noteId: string) => {
       throw new Error("Error deleting note: " + error.message)
     })
 }
+
+export const deleteNoteByParentFolderId = (parentFolderId: string) => {
+  const notesQuery = query(collection(db, "notes"), where("parentFolderId", "==", parentFolderId));
+
+  return getDocs(notesQuery)
+    .then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        deleteDoc(doc.ref)
+          .catch((error) => {
+            throw new Error("Error deleting notes: " + error.message);
+          });
+      });
+
+      return "Notes deleted successfully";
+    })
+    .catch((error) => {
+      throw new Error("Error fetching notes: " + error.message);
+    });
+};
+
