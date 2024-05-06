@@ -59,25 +59,20 @@ const FolderItem = ({ folderDetails }: FolderItemProps) => {
 
   return (
     <TouchableOpacity
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: "white",
-        borderRadius: 8,
-        marginVertical: 4,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
-      }}
+      className="flex-row items-center bg-white rounded-lg my-1 px-2 py-3"
       onPress={handleFolderItemPress}
       onLongPress={handleLongPress}
     >
-      <View style={{ marginRight: 12 }}>
+      <View className="mr-3">
         <Feather name="folder" size={28} color={COLORS.darkOrange} />
       </View>
-      <Text style={{ color: "gray", fontSize: 16 }} numberOfLines={1}>
+      <Text
+        className={`text-gray-800 text-lg h-full font-semibold`}
+        numberOfLines={1}
+      >
         {folderDetails.title}
       </Text>
-      <View style={{ flex: 1 }} />
+      <View className="ml-auto" />
       {showDeleteOption ? (
         <TouchableOpacity onPress={handleDeleteFolder}>
           <MaterialIcons name="delete" size={24} color="red" />
