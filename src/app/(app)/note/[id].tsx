@@ -8,7 +8,6 @@ import {
   ScrollView,
   TextInput,
   View,
-  Modal,
   TouchableOpacity,
   Text,
 } from "react-native"
@@ -31,6 +30,10 @@ import { showToast } from "@/src/utils/showToast"
 import { UNKNOWN_ERROR_MESSAGE } from "@/src/constants/ErrorMessages"
 import { convertToPlainText } from "@/src/utils/convertToPlainText"
 import FolderPickerModal from "@/src/components/modals/FolderPickerModal"
+import { SafeAreaView } from "react-native-safe-area-context"
+import ReminderPickerModal from "@/src/components/modals/ReminderPickerModal"
+import useLocalStorage from "@/src/hooks/useLocalStorage"
+import { schedulePushNotification } from "@/src/utils/pushNotifications"
 
 const NotePage = () => {
   const { id }: { id: string } = useLocalSearchParams()
@@ -38,6 +41,8 @@ const NotePage = () => {
   const { session } = useSession()
   const navigation = useNavigation()
   const [isFolderPickerModalVisible, setIsFolderPickerModalVisible] =
+    useState(false)
+  const [isReminderOptionsModalVisible, setIsReminderOptionsModalVisible] =
     useState(false)
 
   const [noteDetails, setNoteDetails] = useState<Omit<Note, "id"> | Note>({
@@ -55,9 +60,13 @@ const NotePage = () => {
 
   const [isFocused, setIsFocused] = useState(false)
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
-  const handleSubmit = () => {
+  const { storage, isStorageLoading, addNotification, removeNotification } =
+    useLocalStorage()
+
+  const [reminderDate, setReminderDate] = useState<Date | undefined>()
+
+  const handleSubmit = async () => {
     if (noteDetails.title === "") {
       showToast("info", "Note can't be saved without a title")
       return
@@ -76,17 +85,27 @@ const NotePage = () => {
             showToast("error", UNKNOWN_ERROR_MESSAGE)
           }
         })
-      setIsDropdownOpen(false)
     } else {
-      createNote(noteDetails)
-        .then(() => router.back())
-        .catch((error) => {
-          if (error.message) {
-            toastFirebaseErrors(error.message)
-          } else {
-            showToast("error", UNKNOWN_ERROR_MESSAGE)
-          }
-        })
+      try {
+        const note = await createNote(noteDetails)
+        const newNoteId = note.id
+        router.back()
+
+        if (reminderDate) {
+          const notificationId = await schedulePushNotification(
+            reminderDate,
+            "Reminder",
+            `Note: ${noteDetails.title}`
+          )
+          addNotification(newNoteId, notificationId, reminderDate)
+        }
+      } catch (error: any) {
+        if (error.message) {
+          toastFirebaseErrors(error.message)
+        } else {
+          showToast("error", UNKNOWN_ERROR_MESSAGE)
+        }
+      }
     }
   }
 
@@ -107,26 +126,33 @@ const NotePage = () => {
         router.back()
       })
       .catch((error) => console.log(error))
-    setIsDropdownOpen(false)
   }
 
   useEffect(() => {
     const getNoteDetails = async () => {
       setIsLoading(true)
-      if (id !== "0") {
-        const note = await getNoteById(id)
-        setNoteDetails(note)
-        setSelectedFolderTitle(note.parentFolderName)
-      } else {
-        setSelectedFolderTitle("Home")
+      if (!isStorageLoading) {
+        if (id !== "0") {
+          const note = await getNoteById(id)
+          setNoteDetails(note)
+          setSelectedFolderTitle(note.parentFolderName)
+          const savedDate = storage[note.id]?.date
+          if (savedDate) {
+            const convertedDate = new Date(savedDate)
+            setReminderDate(convertedDate)
+          }
+        } else {
+          setSelectedFolderTitle("Home")
+        }
       }
       setIsLoading(false)
     }
     const unsubscribe = navigation.addListener("transitionEnd" as any, () => {
       getNoteDetails()
     })
+
     return unsubscribe
-  }, [navigation])
+  }, [navigation, isStorageLoading])
 
   // effect used for showing and hiding note styling toolbar based on keyboard visibility on screen
   useEffect(() => {
@@ -160,6 +186,7 @@ const NotePage = () => {
       })
     }
   }
+
   return (
     <View className="flex-1">
       <Stack.Screen
@@ -169,41 +196,55 @@ const NotePage = () => {
           headerStyle: {
             backgroundColor: "orange",
           },
-          headerRight: () => {
-            return (
-              <View className="flex-row gap-3">
-                {id !== "0" && (
+          header: () => (
+            <SafeAreaView
+              className={`flex-row justify-between items-center px-4 py-3 bg-orange-400`}
+            >
+              <TouchableOpacity onPress={() => router.back()} className="mr-3">
+                <AntDesign name="arrowleft" size={24} color="black" />
+              </TouchableOpacity>
+
+              {!loading && selectedFolderTitle !== "" && (
+                <>
                   <MaterialIcons
-                    name="delete-forever"
+                    name="add-alert"
                     size={24}
                     color="black"
-                    onPress={handleDeleteNote}
+                    onPress={() => setIsReminderOptionsModalVisible(true)}
                   />
-                )}
-                <AntDesign
-                  name="check"
-                  size={24}
-                  color="black"
-                  onPress={handleSubmit}
-                  style={{ opacity: noteDetails.title === "" ? 0.3 : 1 }}
-                />
-              </View>
-            )
-          },
-          headerTitle: () => (
-            <>
-              {!loading && selectedFolderTitle !== "" && (
-                <TouchableOpacity
-                  onPress={() => setIsFolderPickerModalVisible(true)}
-                  className="flex-row justify-start items-center"
-                >
-                  <Text className="font-bold text-xl w-3/4" numberOfLines={1}>
-                    Folder: {selectedFolderTitle}
-                  </Text>
-                  <AntDesign name="down" size={15} color="black" style={{}} />
-                </TouchableOpacity>
+                  {/* <MaterialCommunityIcons name="bell-ring" size={24} color="black" /> */}
+                  <TouchableOpacity
+                    onPress={() => setIsFolderPickerModalVisible(true)}
+                    className="flex-row justify-center items-center space-x-1 flex-1"
+                  >
+                    <Text
+                      className="font-bold text-xl text-center p-0"
+                      numberOfLines={1}
+                    >
+                      Folder: {selectedFolderTitle}
+                    </Text>
+                    <AntDesign name="down" size={15} color="black" style={{}} />
+                  </TouchableOpacity>
+                  <View className="flex-row items-center space-x-2">
+                    {id !== "0" && (
+                      <MaterialIcons
+                        name="delete-forever"
+                        size={24}
+                        color="black"
+                        onPress={handleDeleteNote}
+                      />
+                    )}
+                    <TouchableOpacity
+                      onPress={handleSubmit}
+                      disabled={noteDetails.title === ""}
+                      style={{ opacity: noteDetails.title === "" ? 0.3 : 1 }}
+                    >
+                      <AntDesign name="check" size={24} color="black" />
+                    </TouchableOpacity>
+                  </View>
+                </>
               )}
-            </>
+            </SafeAreaView>
           ),
         }}
       />
@@ -250,18 +291,21 @@ const NotePage = () => {
       {/* Toolbar is only visible on note description and when the keyboard is open */}
       {isFocused && isKeyboardVisible && <Toolbar editor={richText} />}
 
-      {/* FolderPickerModal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isFolderPickerModalVisible}
-        onRequestClose={() => setIsFolderPickerModalVisible(false)}
-      >
-        <FolderPickerModal
-          onSelectFolder={handleSelectFolder}
-          onClose={() => setIsFolderPickerModalVisible(false)}
-        />
-      </Modal>
+      <FolderPickerModal
+        isFolderPickerModalVisible={isFolderPickerModalVisible}
+        setIsFolderPickerModalVisible={setIsFolderPickerModalVisible}
+        onSelectFolder={handleSelectFolder}
+        onClose={() => setIsFolderPickerModalVisible(false)}
+      />
+
+      <ReminderPickerModal
+        noteId={id}
+        noteDetails={noteDetails}
+        date={reminderDate}
+        setDate={setReminderDate}
+        isReminderPickerModalVisible={isReminderOptionsModalVisible}
+        setIsReminderPickerModalVisible={setIsReminderOptionsModalVisible}
+      />
     </View>
   )
 }

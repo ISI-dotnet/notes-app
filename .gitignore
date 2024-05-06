@@ -3,6 +3,12 @@
 # dependencies
 node_modules/
 
+# Android
+android/
+
+# Eas build
+eas.json
+
 # Expo
 .expo/
 dist/
