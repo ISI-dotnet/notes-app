@@ -39,7 +39,6 @@ const BrowseScreen = () => {
       },
     })
   }
-
   const handleCreateNewFolder = async () => {
     try {
       if (newFolderTitle === "") {
@@ -62,7 +61,7 @@ const BrowseScreen = () => {
     <SafeAreaView className="flex-1">
       <Stack.Screen
         options={{
-          title: currentFolderName,
+          title: currentFolderId === "home" ? "Home" : currentFolderName,
           headerStyle: {
             backgroundColor: "orange",
           },
