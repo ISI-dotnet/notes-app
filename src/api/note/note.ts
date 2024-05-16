@@ -21,6 +21,7 @@ export const createNote = async (
 ) => {
   return addDoc(collection(db, "notes"), {
     ...noteDetails,
+    isFavourite: "false",
     dateCreated: serverTimestamp(),
     dateModified: serverTimestamp(),
   })
@@ -78,6 +79,18 @@ export const getNoteById = async (noteId: string) => {
       throw error
     })
 }
+
+export const updateFavStatus = async (noteId: string) => {
+  try {
+    const note = await getNoteById(noteId);
+    note.isFavourite = note.isFavourite === "true" ? "false" : "true";
+    await updateNote(note);
+    
+    return "Favourite status updated successfully";
+  } catch (error) {
+    throw new Error("Error updating favourite status");
+  }
+};
 
 export const subscribeToNotesByFolderId = (
   userId: string,
