@@ -11,7 +11,7 @@ type BrowseNoteItemProps = {
 
 const BrowseNoteItem = ({ noteDetails }: BrowseNoteItemProps) => {
   const router = useRouter()
-  const [isLiked, setIsLiked] = useState(false)
+  const [isLiked, setIsLiked] = useState(noteDetails.isFavourite === "true")
 
   const handleNoteItemPress = () => {
     const id = noteDetails.id.toString()

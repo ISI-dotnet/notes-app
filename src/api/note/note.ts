@@ -157,6 +157,30 @@ export const subscribeToRecentNotes = (
   })
 }
 
+export const subscribeToFavouriteNotes = (
+  userId: string,
+  callback: (notes: Note[]) => void
+) => {
+  const notesRef = collection(db, "notes")
+  const q = query(
+    notesRef,
+    where("userId", "==", userId),
+    where("isFavourite", "==", "true"),
+    orderBy("dateModified", "desc"),
+  )
+
+  return onSnapshot(q, (snapshot) => {
+    const favouriteNotes: Note[] = []
+    snapshot.forEach((doc) => {
+      const note = { id: doc.id, ...doc.data() } as Note
+      favouriteNotes.push(note)
+    })
+
+    callback(favouriteNotes)
+  })
+}
+
+
 export const deleteNote = async (noteId: string) => {
   const noteRef = doc(db, "notes", noteId)
 
