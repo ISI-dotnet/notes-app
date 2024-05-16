@@ -6,6 +6,7 @@ export type Note = {
   richTextDescription: string
   parentFolderId: string
   parentFolderName: string
+  isFavourite: string
   dateCreated?: Date
   dateModified?: Date
 }

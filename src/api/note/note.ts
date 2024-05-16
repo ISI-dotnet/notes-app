@@ -21,6 +21,7 @@ export const createNote = async (
 ) => {
   return addDoc(collection(db, "notes"), {
     ...noteDetails,
+    isFavourite: "false",
     dateCreated: serverTimestamp(),
     dateModified: serverTimestamp(),
   })
@@ -94,6 +95,18 @@ export const getAllNotes = async (userId: string) => {
     .catch((error) => {
       throw error
     })
+}
+
+export const updateFavStatus = async (noteId: string) => {
+  try {
+    const note = await getNoteById(noteId)
+    note.isFavourite = note.isFavourite === "true" ? "false" : "true"
+    await updateNote(note)
+
+    return "Favourite status updated successfully"
+  } catch (error) {
+    throw new Error("Error updating favourite status")
+  }
 }
 
 export const subscribeToNotesByFolderId = (
@@ -194,6 +207,29 @@ export const subscribeToAllNotes = (
     })
 
     callback(existingNotes)
+  })
+}
+
+export const subscribeToFavouriteNotes = (
+  userId: string,
+  callback: (notes: Note[]) => void
+) => {
+  const notesRef = collection(db, "notes")
+  const q = query(
+    notesRef,
+    where("userId", "==", userId),
+    where("isFavourite", "==", "true"),
+    orderBy("dateModified", "desc")
+  )
+
+  return onSnapshot(q, (snapshot) => {
+    const favouriteNotes: Note[] = []
+    snapshot.forEach((doc) => {
+      const note = { id: doc.id, ...doc.data() } as Note
+      favouriteNotes.push(note)
+    })
+
+    callback(favouriteNotes)
   })
 }
 
