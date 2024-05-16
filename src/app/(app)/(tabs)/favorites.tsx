@@ -44,16 +44,6 @@ const FavoritesScreen = () => {
         ) : (
           <Text>You don't have any favourites yet</Text>
         )}
-        <TouchableOpacity
-          className={`mt-4 bg-orange-400 h-12 rounded-md justify-center items-center shadow-sm shadow-black`}
-          onPress={async () => {
-            await schedulePushNotification()
-          }}
-        >
-          <Text className="text-base font- text-white uppercase">
-            Start notification
-          </Text>
-        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   )
