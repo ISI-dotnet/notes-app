@@ -18,8 +18,14 @@ const NoteItem = ({ noteDetails }: NoteItemProps) => {
     router.navigate(`/note/${id}`)
   }
 
-  const handleLikeNote = () => {
-    setIsLiked(!isLiked) // Toggle like state
+  const handleLikeNote = async () => {
+    try {
+      setIsLiked(!isLiked)
+      await updateFavStatus(noteDetails.id)
+    } catch (error) {
+      setIsLiked((prevIsLiked) => !prevIsLiked)
+      console.error("Error updating favorite status:", error)
+    }
   }
 
   return (
@@ -49,7 +55,7 @@ const NoteItem = ({ noteDetails }: NoteItemProps) => {
           </Text>
         </View>
         <TouchableOpacity onPress={handleLikeNote}>
-          <View className="flex items-center justify-center">
+          <View className="flex items-center justify-center mt-2">
             <MaterialCommunityIcons
               name={isLiked ? "heart" : "heart-outline"}
               size={30}

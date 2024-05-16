@@ -50,6 +50,7 @@ const NotePage = () => {
     title: "",
     description: "",
     richTextDescription: "",
+    isFavourite: "",
     parentFolderName: "Home",
     parentFolderId: "home",
   })
