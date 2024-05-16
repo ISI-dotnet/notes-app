@@ -33,7 +33,7 @@ const BrowseNoteItem = ({ noteDetails }: BrowseNoteItemProps) => {
       className="flex-row items-center bg-white rounded-lg my-1 px-2 h-20"
       onPress={handleNoteItemPress}
     >
-      <View className="flex-row">
+      <View className="flex-row items-center">
         <View className="mr-3">
           <MaterialCommunityIcons
             name="note-text-outline"
@@ -55,7 +55,7 @@ const BrowseNoteItem = ({ noteDetails }: BrowseNoteItemProps) => {
           </Text>
         </View>
         <TouchableOpacity onPress={handleLikeNote}>
-          <View className="flex items-center justify-center mt-2">
+          <View className="mr-2">
             <MaterialCommunityIcons
               name={isLiked ? "heart" : "heart-outline"}
               size={30}
