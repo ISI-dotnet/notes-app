@@ -3,6 +3,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { Note } from "@/src/types/Note"
 import { useRouter } from "expo-router"
 import { memo, useState } from "react"
+import { updateFavStatus } from "@/src/api/note/note"
 
 type NoteItemProps = {
   noteDetails: Note
@@ -47,13 +48,15 @@ const NoteItem = ({ noteDetails }: NoteItemProps) => {
               : "Description empty"}
           </Text>
         </View>
-        <View className="flex items-center justify-center">
-          <MaterialCommunityIcons
-            name={isLiked ? "heart" : "heart-outline"}
-            size={30}
-            color={isLiked ? "red" : "gray"}
-          />
-        </View>
+        <TouchableOpacity onPress={handleLikeNote}>
+          <View className="flex items-center justify-center">
+            <MaterialCommunityIcons
+              name={isLiked ? "heart" : "heart-outline"}
+              size={30}
+              color={isLiked ? "red" : "gray"}
+            />
+          </View>
+        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   )
