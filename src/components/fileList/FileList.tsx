@@ -3,7 +3,7 @@ import { NoteFolder } from "@/src/types/NoteFolder"
 import { useLocalSearchParams } from "expo-router"
 import React, { useMemo } from "react"
 import { FlatList } from "react-native"
-import NoteItem from "./NoteItem"
+import BrowseNoteItem from "./BrowseNoteItem"
 import FolderItem from "./FolderItem"
 import EmptyFolder from "./EmptyFolder"
 import { useLoader } from "@/src/context/useLoader"
@@ -51,7 +51,7 @@ const FileList = () => {
       data={sortedFileList}
       renderItem={({ item }) => {
         return "description" in item ? (
-          <NoteItem noteDetails={item} />
+          <BrowseNoteItem noteDetails={item} />
         ) : (
           <FolderItem folderDetails={item} />
         )
