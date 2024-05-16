@@ -1,8 +1,32 @@
 import { COLORS } from "@/src/constants/Colors"
 import { Feather } from "@expo/vector-icons"
 import { Tabs } from "expo-router"
+import { useEffect, useState } from "react"
+import { Keyboard } from "react-native"
 
 const TabLayout = () => {
+  const [keyboardVisible, setKeyboardVisible] = useState(false)
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        setKeyboardVisible(true)
+      }
+    )
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setKeyboardVisible(false)
+      }
+    )
+
+    return () => {
+      keyboardDidShowListener.remove()
+      keyboardDidHideListener.remove()
+    }
+  }, [])
+
   return (
     <Tabs
       screenOptions={{
@@ -10,7 +34,7 @@ const TabLayout = () => {
         tabBarActiveBackgroundColor: "orange",
         tabBarStyle: {
           borderRadius: 30,
-          marginBottom: 10,
+          marginBottom: keyboardVisible ? 0 : 10,
           marginHorizontal: 8,
           elevation: 0,
           height: 60,
@@ -55,6 +79,17 @@ const TabLayout = () => {
           browse: ["Home"],
           currentFolderId: "home",
           previousFolderId: "home",
+        }}
+      />
+      <Tabs.Screen
+        name="search"
+        options={{
+          tabBarHideOnKeyboard: true,
+          title: "Search",
+          tabBarIcon: ({ color }) => (
+            <Feather name="search" size={24} color={color} />
+          ),
+          headerStyle: { backgroundColor: "orange" },
         }}
       />
       <Tabs.Screen

@@ -80,17 +80,34 @@ export const getNoteById = async (noteId: string) => {
     })
 }
 
+export const getAllNotes = async (userId: string) => {
+  const notesRef = collection(db, "notes")
+  const q = query(notesRef, where("userId", "==", userId))
+
+  return getDocs(q)
+    .then((querySnapshot) => {
+      const notes: Note[] = []
+      querySnapshot.forEach((doc) => {
+        notes.push({ id: doc.id, ...doc.data() } as Note)
+      })
+      return notes
+    })
+    .catch((error) => {
+      throw error
+    })
+}
+
 export const updateFavStatus = async (noteId: string) => {
   try {
-    const note = await getNoteById(noteId);
-    note.isFavourite = note.isFavourite === "true" ? "false" : "true";
-    await updateNote(note);
-    
-    return "Favourite status updated successfully";
+    const note = await getNoteById(noteId)
+    note.isFavourite = note.isFavourite === "true" ? "false" : "true"
+    await updateNote(note)
+
+    return "Favourite status updated successfully"
   } catch (error) {
-    throw new Error("Error updating favourite status");
+    throw new Error("Error updating favourite status")
   }
-};
+}
 
 export const subscribeToNotesByFolderId = (
   userId: string,
@@ -157,6 +174,42 @@ export const subscribeToRecentNotes = (
   })
 }
 
+export const subscribeToAllNotes = (
+  userId: string,
+  existingNotes: Note[],
+  callback: (notes: Note[]) => void
+) => {
+  const notesRef = collection(db, "notes")
+  const q = query(notesRef, where("userId", "==", userId))
+  return onSnapshot(q, (snapshot) => {
+    snapshot.docChanges().forEach((change) => {
+      const note = { id: change.doc.id, ...change.doc.data() } as Note
+      if (change.type === "added") {
+        const existingNoteIndex = existingNotes.findIndex(
+          (n) => n.id === note.id
+        )
+        if (existingNoteIndex === -1) {
+          // If not found, push the note to modifiedNotes array
+          existingNotes.push(note)
+        }
+      } else if (change.type === "modified") {
+        // Find the index of the modified note in modifiedNotes array
+        const index = existingNotes.findIndex((n) => n.id === note.id)
+        // If found, replace the existing note with the modified one
+
+        if (index !== -1) {
+          existingNotes[index] = note
+        }
+      } else if (change.type === "removed") {
+        // Filter out the removed note from the modifiedNotes array
+        existingNotes = existingNotes.filter((n) => n.id !== note.id)
+      }
+    })
+
+    callback(existingNotes)
+  })
+}
+
 export const subscribeToFavouriteNotes = (
   userId: string,
   callback: (notes: Note[]) => void
@@ -166,7 +219,7 @@ export const subscribeToFavouriteNotes = (
     notesRef,
     where("userId", "==", userId),
     where("isFavourite", "==", "true"),
-    orderBy("dateModified", "desc"),
+    orderBy("dateModified", "desc")
   )
 
   return onSnapshot(q, (snapshot) => {
@@ -180,7 +233,6 @@ export const subscribeToFavouriteNotes = (
   })
 }
 
-
 export const deleteNote = async (noteId: string) => {
   const noteRef = doc(db, "notes", noteId)
 
@@ -192,21 +244,22 @@ export const deleteNote = async (noteId: string) => {
 }
 
 export const deleteNoteByParentFolderId = (parentFolderId: string) => {
-  const notesQuery = query(collection(db, "notes"), where("parentFolderId", "==", parentFolderId));
+  const notesQuery = query(
+    collection(db, "notes"),
+    where("parentFolderId", "==", parentFolderId)
+  )
 
   return getDocs(notesQuery)
     .then((querySnapshot) => {
       querySnapshot.forEach((doc) => {
-        deleteDoc(doc.ref)
-          .catch((error) => {
-            throw new Error("Error deleting notes: " + error.message);
-          });
-      });
+        deleteDoc(doc.ref).catch((error) => {
+          throw new Error("Error deleting notes: " + error.message)
+        })
+      })
 
-      return "Notes deleted successfully";
+      return "Notes deleted successfully"
     })
     .catch((error) => {
-      throw new Error("Error fetching notes: " + error.message);
-    });
-};
-
+      throw new Error("Error fetching notes: " + error.message)
+    })
+}
